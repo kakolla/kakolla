@@ -10,7 +10,7 @@ function Title(props: Props) {
 
 
     return <>
-        <h1 className="text-4xl font-bold underline" id="info">{props.text}</h1>
+        <h1 className="text-4xl font-bold " id="info">{props.text}</h1>
     </>
 } 
 
