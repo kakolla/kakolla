@@ -6,6 +6,8 @@ import WebGL from 'three/addons/capabilities/WebGL.js';
 
 import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 function ThreeScene() {
     
     
@@ -32,7 +34,7 @@ function ThreeScene() {
     scene.add( cube );
     camera.position.z = 10;
     camera.position.x = 0;
-    camera.position.y = 3;
+    camera.position.y = 7;
 
     
 
@@ -68,6 +70,13 @@ function ThreeScene() {
     dl.position.set(3, 7, 0);
     const dlHelper = new THREE.DirectionalLightHelper(dl, 3);
     scene.add(dl, dlHelper);
+
+    // adding controls for camera
+    const controls = new OrbitControls( camera, renderer.domElement);
+
+    
+
+
     
 
     // animation loop
@@ -85,6 +94,7 @@ function ThreeScene() {
             model.rotation.y += 0.001;
             model.scale.set(0.3, 0.3, 0.3);
         }
+        controls.update();
 
     }
 
