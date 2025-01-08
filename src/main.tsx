@@ -7,15 +7,11 @@ import './index.css'
 import ThreeScene from './ThreeScene.tsx'
 import Title from './Title.tsx'
 import NavBar from './NavBar.tsx'
+import App from './App.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <div >
-      <Title text='Abi Kakolla' />
-      <ThreeScene />
-      <NavBar />
-    </div>
-    {/* <App /> */}
+    <App />
   </StrictMode>,
 )
