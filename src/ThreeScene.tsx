@@ -77,7 +77,7 @@ function ThreeScene() {
     }, []);
 
 
-    return <div ref={containerRef}></div>;
+    return <div className="-my-5 absolute t-10 w-100 z-100" ref={containerRef}></div>;
 }
 
 export default ThreeScene;

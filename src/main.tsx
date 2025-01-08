@@ -8,8 +8,11 @@ import Title from './Title.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Title text='Abi Kakolla' />
-    <ThreeScene />
+    <div >
+      <Title text='Abi Kakolla' />
+      <ThreeScene />
+
+    </div>
     {/* <App /> */}
   </StrictMode>,
 )
