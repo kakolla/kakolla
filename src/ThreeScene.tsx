@@ -15,8 +15,10 @@ function ThreeScene() {
     const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / 
         window.innerHeight, 0.1, 1000 );
     
+    // turn on antialiasing: {antialias: true} inside WebGLRenderer()
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio( window.devicePixelRatio );
 
     // const src = renderer.domElement.toDataURL();
 
@@ -49,8 +51,9 @@ function ThreeScene() {
     // load obj
     const loader = new GLTFLoader();
     let model: THREE.Object3D | null = null;
-    loader.load( 'public/scene.gltf', function ( gltf ) {
+    loader.load( 'public/test/scene.gltf', function ( gltf ) {
         model = gltf.scene;
+        // model.scale.set(2, 2, 2);
         model.rotation.y = Math.PI / 4;
         scene.add( gltf.scene );
         console.log("Model loaded");
@@ -58,13 +61,13 @@ function ThreeScene() {
         console.error( error );
     } );    
 
-    const light = new THREE.AmbientLight( 0xffffff, 1);
+    const light = new THREE.AmbientLight( 0xffffff, 0.1);
     scene.add(light);
 
-    const dl = new THREE.DirectionalLight(0xffffff, 1);
-    dl.position.set(0, 2, 0);
-    // const dlHelper = new THREE.DirectionalLightHelper(dl, 3);
-    scene.add(dl);
+    const dl = new THREE.DirectionalLight( 0xffdd40, 3);
+    dl.position.set(3, 7, 0);
+    const dlHelper = new THREE.DirectionalLightHelper(dl, 3);
+    scene.add(dl, dlHelper);
     
 
     // animation loop
@@ -79,7 +82,8 @@ function ThreeScene() {
         cube.rotation.y += 0.01;
         if (model)
         {
-            model.rotation.y += 0.01;
+            model.rotation.y += 0.001;
+            model.scale.set(0.3, 0.3, 0.3);
         }
 
     }
