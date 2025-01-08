@@ -46,6 +46,11 @@ function ThreeScene() {
 
     // animation loop
     function animate() {
+        // renderer.setSize( window.innerWidth, window.innerHeight);
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        renderer.setSize(vw, vh);
         renderer.render(scene, camera);
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
@@ -60,7 +65,7 @@ function ThreeScene() {
     }
 
     // use Ref hook to create a container that renderer.domElement (HTMLCanvasElement) can be added to
-    const containerRef = useRef<HTMLDivElement>(null); // creates reference to this div element (JSX Element)
+    const containerRef = useRef<HTMLDivElement>(null); // create reference to this div element (JSX Element)
 
     useEffect(() => {
         if (containerRef.current) {
@@ -76,8 +81,8 @@ function ThreeScene() {
         
     }, []);
 
-
-    return <div className="-my-5 absolute t-10 w-100 z-100" ref={containerRef}></div>;
+    console.log(window.innerWidth + 'x' + window.innerHeight);
+    return <div className="" ref={containerRef}></div>;
 }
 
 export default ThreeScene;
