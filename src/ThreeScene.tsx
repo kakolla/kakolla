@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 
+import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 function ThreeScene() {
     
     
@@ -27,7 +29,8 @@ function ThreeScene() {
     const cube = new THREE.Mesh(geometry, material);
     scene.add( cube );
     camera.position.z = 10;
-
+    camera.position.x = 0;
+    camera.position.y = 3;
 
     
 
@@ -42,6 +45,26 @@ function ThreeScene() {
     // const geometry = new THREE.BufferGeometry().setFromPoints( points);
     // const line = new THREE.Line( geometry, material);
     // scene.add(line);
+
+    // load obj
+    const loader = new GLTFLoader();
+    let model: THREE.Object3D | null = null;
+    loader.load( 'public/scene.gltf', function ( gltf ) {
+        model = gltf.scene;
+        model.rotation.y = Math.PI / 4;
+        scene.add( gltf.scene );
+        console.log("Model loaded");
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );    
+
+    const light = new THREE.AmbientLight( 0xffffff, 1);
+    scene.add(light);
+
+    const dl = new THREE.DirectionalLight(0xffffff, 1);
+    dl.position.set(0, 2, 0);
+    // const dlHelper = new THREE.DirectionalLightHelper(dl, 3);
+    scene.add(dl);
     
 
     // animation loop
@@ -54,6 +77,11 @@ function ThreeScene() {
         renderer.render(scene, camera);
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
+        if (model)
+        {
+            model.rotation.y += 0.01;
+        }
+
     }
 
     // double check if webGL is compatible (from three js docs)
