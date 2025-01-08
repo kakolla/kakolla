@@ -1,5 +1,7 @@
 // import { useState } from 'react';
 import * as THREE from 'three';
+import WebGL from 'three/addons/capabilities/WebGL.js';
+
 
 function ThreeScene() {
     
@@ -18,21 +20,42 @@ function ThreeScene() {
     document.body.appendChild( renderer.domElement);
     
     // set up test cube
-    const geometry = new THREE.BoxGeometry( 1, 1, 1);
-    const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add( cube );
-    camera.position.z = 5;
+    // const geometry = new THREE.BoxGeometry( 1, 1, 1);
+    // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // scene.add( cube );
+    camera.position.z = 10;
 
+
+    
+
+    
+    // create line
+    const material = new THREE.LineBasicMaterial( { color: 0x0000ff });
+    const points = [];
+    points.push(new THREE.Vector3( -10, 0, 0));
+    points.push(new THREE.Vector3( 0, 10, 0));
+    points.push(new THREE.Vector3( 10, 0, 0));
+    
+    const geometry = new THREE.BufferGeometry().setFromPoints( points);
+    const line = new THREE.Line( geometry, material);
+    scene.add(line);
+    
 
     // animation loop
     function animate() {
         renderer.render(scene, camera);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+        // cube.rotation.x += 0.01;
+        // cube.rotation.y += 0.01;
     }
-    renderer.setAnimationLoop( animate );
 
+    // double check if webGL is compatible (from three js docs)
+    if (WebGL.isWebGL2Available() ) {
+        renderer.setAnimationLoop( animate );
+    } else {
+        const warning = WebGL.getWebGL2ErrorMessage();
+        document.getElementById('root')?.appendChild(warning);
+    }
 
 
 
