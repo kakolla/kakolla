@@ -83,6 +83,7 @@ function ThreeScene() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth /
         window.innerHeight, 0.1, 2000);
+    
 
     // turn on antialiasing: {antialias: true} inside WebGLRenderer()
     const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance", antialias: false });
@@ -90,6 +91,8 @@ function ThreeScene() {
     renderer.setPixelRatio(window.devicePixelRatio);
 
 
+    addEventListener("resize", () => {renderer.setSize( window.innerWidth, window.innerHeight);});
+    
 
 
 
