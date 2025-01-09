@@ -11,7 +11,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 // post processing
-import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+import { BlendFunction, BloomEffect, EffectComposer, EffectPass, NoiseTexture, RenderPass } from "postprocessing";
+import { NoiseEffect } from 'postprocessing';
+import { GlitchEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 import React from 'react';
 
@@ -214,11 +216,20 @@ function ThreeScene() {
     scene.add(pl);
 
 
-    // post processing
+    // post processing effects
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(new EffectPass(camera, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
+    const noiseEffect = new NoiseEffect({
+        blendFunction: BlendFunction.SCREEN, 
+        premultiply: true,
+    });
+    
+    noiseEffect.blendMode.opacity.value = 0.75; // control strength of effect    
+    composer.addPass(new EffectPass(camera, noiseEffect));
 
+
+    
     requestAnimationFrame(function render() {
 
         requestAnimationFrame(render);
