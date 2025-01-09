@@ -99,6 +99,8 @@ function ThreeScene() {
     camera.position.x = 0;
     camera.position.y = 2;
     controls.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
+    controls.enableDamping = true;
+    controls.maxDistance = 10;
 
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
