@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -12,7 +12,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // post processing
 import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
-
+import { AnimationMixer, Clock } from "three";
 
 
 function loadObject(path: string): THREE.Object3D<THREE.Object3DEventMap> {
@@ -36,6 +36,43 @@ function loadObject(path: string): THREE.Object3D<THREE.Object3DEventMap> {
     return placeholder;
 
 
+}
+
+async function loadObjectWithAnimation(path: string, scene: THREE.Scene): Promise<[THREE.Object3D, THREE.AnimationMixer]> {
+    return new Promise((resolve, reject) => {
+        const loader = new GLTFLoader();
+        const placeholder = new THREE.Object3D(); // Placeholder object
+        
+        loader.load(
+            path,
+            (gltf) => {
+                const model = gltf.scene;
+                model.rotation.y = Math.PI / 4;
+                console.log("Model " + path + " loaded");
+
+                placeholder.add(...model.children);
+
+                // create an animation mixer
+                const animMixer = new THREE.AnimationMixer(model);
+                scene.add(placeholder); // add THREE.Object3D version to scene
+
+                // play the first animation if available
+                if (gltf.animations.length > 0) {
+                    // important***: must pass in 2nd argument which is the THREE.Object3D
+                    const action = animMixer.clipAction(gltf.animations[0], placeholder);
+                    action.play();
+                }
+
+                // resolve the promise with both model and mixer
+                resolve([placeholder, animMixer]);
+            },
+            undefined,
+            (error) => {
+                console.error(error);
+                reject("Failed to load model");
+            }
+        );
+    });
 }
 
 function ThreeScene() {
@@ -73,16 +110,36 @@ function ThreeScene() {
     let homeModel: THREE.Object3D = loadObject('public/home/home.gltf');
     scene.add(homeModel);
 
-    let dust: THREE.Object3D = loadObject('public/particles/scene.gltf');
-    scene.add(dust);
 
+    // add particles
+    const clock = new Clock(); // for animations
+    let animMixer: AnimationMixer; // for now, for particle animation
+    let particles: THREE.Object3D | null=null;
+    
+
+    
+    // load animated particles using promise (and only once)
+    useEffect(() => {
+        async function loadModel() {
+            try {
+                [particles, animMixer] = await loadObjectWithAnimation('public/particles/scene.gltf', scene);
+                scene.add(particles);
+            } catch (error) {
+                console.error("Error loading model with animation:", error);
+            }
+        }
+        loadModel();
+    }, []); // only run once on mount
+    
+
+    
     const light = new THREE.AmbientLight(0xffffff, 0.01);
     scene.add(light);
 
-    const dl = new THREE.PointLight(0xffffff, 3, 3, 2);
-    dl.position.set(1.3, 1.8, 0);
+    const pl = new THREE.PointLight(0xffffff, 5, 3, 2);
+    pl.position.set(-0.5, 2, 0);
     // const dlHelper = new THREE.PointLightHelper(dl, 1);
-    scene.add(dl);
+    scene.add(pl);
 
 
     // post processing
@@ -106,17 +163,12 @@ function ThreeScene() {
 
     // animation loop
     function animate() {
+        const deltaTime = clock.getDelta();
+        if (animMixer) {
+            animMixer.update(deltaTime); // Update animation mixer for particle animations
+            animMixer.timeScale = 0.1;
+        }
 
-
-        // const vw = window.innerWidth;
-        // const vh = window.innerHeight;
-        // renderer.setSize(vw, vh);
-        // renderer.render(scene, camera);
-        // if (homeModel) {
-        //     homeModel.rotation.y += 0.001;
-        // }
-        // requestAnimationFrame(animate);
-        // controls.update(); // camera controls update
     }
 
     // double check if webGL is compatible (from three js docs)
