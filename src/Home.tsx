@@ -10,14 +10,14 @@ function Home({ pageState }: Props) {
             <h1 className="pt-4">I'm currently a 2nd year CS Student at USC.</h1>
             <p className="pt-2 max-w-xl">
                 My love for computers and everything engineering started when I was 8 when I learned how to use windows shell scripting
-                to create my first quiz game. Ever since then, I've loved using computers to build creative solutions to all sorts of problems.
+                to create my first quiz game. Ever since then, I've loved using computers to build creative solutions for all sorts of problems.
             </p>
 
             <br />
             <br />
             <p className="pt-2 max-w-xl">
                 Currently, I'm super passionate about the intersection of neuroscience, machine learning, and computer science. I've spent
-                the last few years performing research in a computational neuroscience lab, working on startups, participating in Hackathons, and much more!
+                the last few years performing research at the Center for Neural Engineering @ USC, working on startups, participating in Hackathons, and much more!
             </p>
 
             <br />

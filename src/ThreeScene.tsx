@@ -1,5 +1,5 @@
 // import { useState } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
@@ -13,27 +13,33 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // post processing
 import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { AnimationMixer, Clock } from "three";
+import React from 'react';
 
 
-function loadObject(path: string): THREE.Object3D<THREE.Object3DEventMap> {
+async function loadObject(path: string): Promise<THREE.Object3D> {
 
-    const loader = new GLTFLoader();
 
-    const placeholder = new THREE.Object3D(); // Placeholder object
 
-    let model;
-    loader.load(path, function (gltf) {
-        model = gltf.scene;
-        model.rotation.y = Math.PI / 4;
-        console.log("Model " + path + " loaded");
-        placeholder.add(...model.children);
-    }, undefined, function (error) {
-        console.error(error);
-        console.error("Failed to load model");
+    return new Promise((resolve, reject) => {
 
+        const loader = new GLTFLoader();
+
+        const placeholder = new THREE.Object3D(); // Placeholder object
+
+        let model;
+        loader.load(path, function (gltf) {
+            model = gltf.scene;
+            model.rotation.y = Math.PI / 4;
+            placeholder.add(...model.children);
+            console.log("Model " + path + " loaded");
+            resolve(placeholder);
+        }, undefined, function (error) {
+            console.error(error);
+            console.error("Failed to load model");
+            reject("error");
+
+        });
     });
-
-    return placeholder;
 
 
 }
@@ -42,13 +48,14 @@ async function loadObjectWithAnimation(path: string, scene: THREE.Scene): Promis
     return new Promise((resolve, reject) => {
         const loader = new GLTFLoader();
         const placeholder = new THREE.Object3D(); // Placeholder object
-        
+
         loader.load(
             path,
             (gltf) => {
                 const model = gltf.scene;
                 model.rotation.y = Math.PI / 4;
                 console.log("Model " + path + " loaded");
+                // console.log(scene.children);
 
                 placeholder.add(...model.children);
 
@@ -76,6 +83,9 @@ async function loadObjectWithAnimation(path: string, scene: THREE.Scene): Promis
 }
 
 function ThreeScene() {
+    console.log("mounting ThreeScene component");
+    const homeModelRef = useRef<THREE.Object3D | null>(null);
+    const [homeModel, setHomeModel] = useState<THREE.Object3D | null>(null);
 
 
 
@@ -83,7 +93,7 @@ function ThreeScene() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth /
         window.innerHeight, 0.1, 2000);
-    
+
 
     // turn on antialiasing: {antialias: true} inside WebGLRenderer()
     const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance", antialias: false });
@@ -91,8 +101,8 @@ function ThreeScene() {
     renderer.setPixelRatio(window.devicePixelRatio);
 
 
-    addEventListener("resize", () => {renderer.setSize( window.innerWidth, window.innerHeight);});
-    
+    addEventListener("resize", () => { renderer.setSize(window.innerWidth, window.innerHeight); });
+
 
 
 
@@ -111,18 +121,57 @@ function ThreeScene() {
     // const cube = new THREE.Mesh(geometry, material);
     // scene.add( cube );
 
-    // load obj
-    let homeModel: THREE.Object3D = loadObject('public/home/home.gltf');
-    scene.add(homeModel);
+    // load obj using hook (only once)
+    useEffect(() => {
+        let isMounted = true;
+        async function loadHome() {
+            try {
+                const loadedModel = await loadObject('public/home/home.gltf');
+                if (isMounted)
+                {
+                    scene.add(loadedModel);
+                    setHomeModel(loadedModel);
+                    homeModelRef.current = loadedModel;
+
+                }
+
+            } catch (error) {
+                console.error("Error loading model (no animation): ", error);
+            }
+        }
+        loadHome();
+
+        return () => 
+        {
+            isMounted = false;
+            // homeModel?.traverse((child) => {
+                //     if ((child as any).material) {
+                    //         (child as any).material.dispose();
+            //     }
+            //     if ((child as any).geometry) {
+            //         (child as any).geometry.dispose();
+            //     }
+            //     if ((child as any).texture) {
+            //         (child as any).texture.dispose();
+            //     }
+            // });
+            if (homeModelRef.current){
+                console.log("removing home");
+                scene.remove(homeModelRef.current);
+            }
+
+        }
+    }, []); // run once
+
 
 
     // add particles
     const clock = new Clock(); // for animations
     let animMixer: AnimationMixer; // for now, for particle animation
-    let particles: THREE.Object3D | null=null;
-    
+    let particles: THREE.Object3D | null = null;
 
-    
+
+
     // load animated particles using promise (and only once)
     useEffect(() => {
         async function loadModel() {
@@ -134,10 +183,28 @@ function ThreeScene() {
             }
         }
         loadModel();
-    }, []); // only run once on mount
-    
 
-    
+        // cleanup
+        return () => {
+            if (particles) {
+                particles.traverse((child) => {
+                    if ((child as any).material) {
+                        (child as any).material.dispose();
+                    }
+                    if ((child as any).geometry) {
+                        (child as any).geometry.dispose();
+                    }
+                    if ((child as any).texture) {
+                        (child as any).texture.dispose();
+                    }
+                });
+                scene.remove(particles);
+            }
+        };
+    }, []); // only run once on mount
+
+
+
     const light = new THREE.AmbientLight(0xffffff, 0.01);
     scene.add(light);
 
@@ -150,7 +217,7 @@ function ThreeScene() {
     // post processing
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new EffectPass(camera, new BloomEffect({intensity: 3, luminanceThreshold: .7, radius: 0.5})));
+    composer.addPass(new EffectPass(camera, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
 
     requestAnimationFrame(function render() {
 
@@ -164,7 +231,7 @@ function ThreeScene() {
     });
 
 
-   
+
 
     // animation loop
     function animate() {
@@ -201,8 +268,8 @@ function ThreeScene() {
 
     }, []);
 
-    console.log(window.innerWidth + 'x' + window.innerHeight);
+    // console.log(window.innerWidth + 'x' + window.innerHeight);
     return <div className="" ref={containerRef}></div>;
 }
 
-export default ThreeScene;
+export default React.memo(ThreeScene); // memo makes sure component doesn't re-render if parent re-renders unless props of this comp changes
