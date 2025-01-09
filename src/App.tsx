@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ThreeScene from './ThreeScene.tsx'
 import Title from './Title.tsx'
 import NavBar from './NavBar.tsx'
+import Home from './Home.tsx';
 
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
 
     return <>
         <Title text="Abi Kakolla's" pageState={state} />
+        <Home pageState={state} />
         <ThreeScene />
         <NavBar pageState={state} onClickFunc={setState}/>
 
