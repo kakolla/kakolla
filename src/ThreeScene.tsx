@@ -4,28 +4,34 @@ import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 
-import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
-function loadObject(path: string) : THREE.Object3D<THREE.Object3DEventMap>  {
+
+// post processing
+import { BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+
+
+
+function loadObject(path: string): THREE.Object3D<THREE.Object3DEventMap> {
 
     const loader = new GLTFLoader();
-    
+
     const placeholder = new THREE.Object3D(); // Placeholder object
 
     let model;
-    loader.load(path, function ( gltf ) {
+    loader.load(path, function (gltf) {
         model = gltf.scene;
         model.rotation.y = Math.PI / 4;
         console.log("Model " + path + " loaded");
         placeholder.add(...model.children);
-    }, undefined, function ( error ) {
-        console.error( error );
+    }, undefined, function (error) {
+        console.error(error);
         console.error("Failed to load model");
 
-    } );  
+    });
 
     return placeholder;
 
@@ -33,29 +39,29 @@ function loadObject(path: string) : THREE.Object3D<THREE.Object3DEventMap>  {
 }
 
 function ThreeScene() {
-    
-    
+
+
 
     // set up scene, camera, and renderer
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera( 55, window.innerWidth / 
-        window.innerHeight, 0.1, 2000 );
-    
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth /
+        window.innerHeight, 0.1, 2000);
+
     // turn on antialiasing: {antialias: true} inside WebGLRenderer()
-    const renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize( window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio( window.devicePixelRatio );
+    const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance", antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
-    
-    
 
-    
+
+
+
     // adding controls for camera
-    const controls = new OrbitControls( camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
     camera.position.z = 4;
     camera.position.x = 0;
     camera.position.y = 2;
-    controls.maxPolarAngle  = Math.PI/2; // prevent camera past ground level
+    controls.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
 
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
@@ -65,38 +71,57 @@ function ThreeScene() {
 
     // load obj
     let homeModel: THREE.Object3D = loadObject('public/home/home.gltf');
-    scene.add(homeModel);    
+    scene.add(homeModel);
 
-    const light = new THREE.AmbientLight( 0xffffff, 0.01);
+    let dust: THREE.Object3D = loadObject('public/particles/scene.gltf');
+    scene.add(dust);
+
+    const light = new THREE.AmbientLight(0xffffff, 0.01);
     scene.add(light);
 
-    const dl = new THREE.PointLight( 0xffffff, 3, 3, 2);
+    const dl = new THREE.PointLight(0xffffff, 3, 3, 2);
     dl.position.set(1.3, 1.8, 0);
     // const dlHelper = new THREE.PointLightHelper(dl, 1);
     scene.add(dl);
 
 
+    // post processing
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    composer.addPass(new EffectPass(camera, new BloomEffect({intensity: 3, luminanceThreshold: .7, radius: 0.5})));
 
-    
+    requestAnimationFrame(function render() {
 
+        requestAnimationFrame(render);
+        composer.render();
+
+        if (homeModel) {
+            homeModel.rotation.y += 0.001;
+        }
+        controls.update(); // camera controls update
+    });
+
+
+   
 
     // animation loop
     function animate() {
 
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        renderer.setSize(vw, vh);
-        renderer.render(scene, camera);
-        if (homeModel)
-        {
-            homeModel.rotation.y += 0.001;
-        }
-        controls.update(); // camera controls update
+
+        // const vw = window.innerWidth;
+        // const vh = window.innerHeight;
+        // renderer.setSize(vw, vh);
+        // renderer.render(scene, camera);
+        // if (homeModel) {
+        //     homeModel.rotation.y += 0.001;
+        // }
+        // requestAnimationFrame(animate);
+        // controls.update(); // camera controls update
     }
 
     // double check if webGL is compatible (from three js docs)
-    if (WebGL.isWebGL2Available() ) {
-        renderer.setAnimationLoop( animate );
+    if (WebGL.isWebGL2Available()) {
+        renderer.setAnimationLoop(animate);
     } else {
         const warning = WebGL.getWebGL2ErrorMessage();
         document.getElementById('root')?.appendChild(warning);
@@ -109,14 +134,14 @@ function ThreeScene() {
         if (containerRef.current) {
             containerRef.current.appendChild(renderer.domElement);
         }
-        
+
         // cleanup when component is deleted
         return () => {
             if (containerRef.current) {
                 containerRef.current.removeChild(renderer.domElement);
             }
         };
-        
+
     }, []);
 
     console.log(window.innerWidth + 'x' + window.innerHeight);
