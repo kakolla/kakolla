@@ -9,7 +9,7 @@ import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
-function loadObject(path: string, scene: THREE.Scene) : THREE.Object3D<THREE.Object3DEventMap>  {
+function loadObject(path: string) : THREE.Object3D<THREE.Object3DEventMap>  {
 
     const loader = new GLTFLoader();
     
@@ -19,7 +19,6 @@ function loadObject(path: string, scene: THREE.Scene) : THREE.Object3D<THREE.Obj
     loader.load(path, function ( gltf ) {
         model = gltf.scene;
         model.rotation.y = Math.PI / 4;
-        // scene.add( gltf.scene );
         console.log("Model " + path + " loaded");
         placeholder.add(...model.children);
     }, undefined, function ( error ) {
@@ -48,21 +47,24 @@ function ThreeScene() {
     renderer.setPixelRatio( window.devicePixelRatio );
 
     
+    
+
+    
+    // adding controls for camera
+    const controls = new OrbitControls( camera, renderer.domElement);
+    camera.position.z = 4;
+    camera.position.x = 0;
+    camera.position.y = 2;
+    controls.maxPolarAngle  = Math.PI/2; // prevent camera past ground level
+
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
     // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
     // const cube = new THREE.Mesh(geometry, material);
     // scene.add( cube );
 
-
-    camera.position.z = 4;
-    camera.position.x = 0;
-    camera.position.y = 2;
-
-    
-
     // load obj
-    let homeModel: THREE.Object3D = loadObject('public/home/home.gltf', scene);
+    let homeModel: THREE.Object3D = loadObject('public/home/home.gltf');
     scene.add(homeModel);    
 
     const light = new THREE.AmbientLight( 0xffffff, 0.01);
@@ -73,31 +75,23 @@ function ThreeScene() {
     // const dlHelper = new THREE.PointLightHelper(dl, 1);
     scene.add(dl);
 
-    // adding controls for camera
-    const controls = new OrbitControls( camera, renderer.domElement);
-
-    
 
 
     
+
 
     // animation loop
     function animate() {
-        // renderer.setSize( window.innerWidth, window.innerHeight);
 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         renderer.setSize(vw, vh);
         renderer.render(scene, camera);
-        // cube.rotation.x += 0.01;
-        // cube.rotation.y += 0.01;
         if (homeModel)
         {
             homeModel.rotation.y += 0.001;
-            // model.scale.set(0.3, 0.3, 0.3);
         }
-        controls.update();
-
+        controls.update(); // camera controls update
     }
 
     // double check if webGL is compatible (from three js docs)
