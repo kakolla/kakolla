@@ -8,6 +8,31 @@ import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+
+function loadObject(path: string, scene: THREE.Scene) : THREE.Object3D<THREE.Object3DEventMap>  {
+
+    const loader = new GLTFLoader();
+    
+    const placeholder = new THREE.Object3D(); // Placeholder object
+
+    let model;
+    loader.load(path, function ( gltf ) {
+        model = gltf.scene;
+        model.rotation.y = Math.PI / 4;
+        // scene.add( gltf.scene );
+        console.log("Model " + path + " loaded");
+        placeholder.add(...model.children);
+    }, undefined, function ( error ) {
+        console.error( error );
+        console.error("Failed to load model");
+
+    } );  
+
+    return placeholder;
+
+
+}
+
 function ThreeScene() {
     
     
@@ -18,50 +43,27 @@ function ThreeScene() {
         window.innerHeight, 0.1, 2000 );
     
     // turn on antialiasing: {antialias: true} inside WebGLRenderer()
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize( window.innerWidth, window.innerHeight);
     renderer.setPixelRatio( window.devicePixelRatio );
 
-    // const src = renderer.domElement.toDataURL();
-
-    // add and render to document
-    // document.body.appendChild( renderer.domElement);
     
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
     // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
     // const cube = new THREE.Mesh(geometry, material);
     // scene.add( cube );
+
+
     camera.position.z = 4;
     camera.position.x = 0;
     camera.position.y = 2;
 
     
 
-    
-    // create line
-    // const material = new THREE.LineBasicMaterial( { color: 0x0000ff });
-    // const points = [];
-    // points.push(new THREE.Vector3( -10, 0, 0));
-    // points.push(new THREE.Vector3( 0, 10, 0));
-    // points.push(new THREE.Vector3( 10, 0, 0));
-    
-    // const geometry = new THREE.BufferGeometry().setFromPoints( points);
-    // const line = new THREE.Line( geometry, material);
-    // scene.add(line);
-
     // load obj
-    const loader = new GLTFLoader();
-    let model: THREE.Object3D | null = null;
-    loader.load( 'public/home/home.gltf', function ( gltf ) {
-        model = gltf.scene;
-        // model.scale.set(2, 2, 2);
-        model.rotation.y = Math.PI / 4;
-        scene.add( gltf.scene );
-        console.log("Model loaded");
-    }, undefined, function ( error ) {
-        console.error( error );
-    } );    
+    let homeModel: THREE.Object3D = loadObject('public/home/home.gltf', scene);
+    scene.add(homeModel);    
 
     const light = new THREE.AmbientLight( 0xffffff, 0.01);
     scene.add(light);
@@ -89,9 +91,9 @@ function ThreeScene() {
         renderer.render(scene, camera);
         // cube.rotation.x += 0.01;
         // cube.rotation.y += 0.01;
-        if (model)
+        if (homeModel)
         {
-            model.rotation.y += 0.001;
+            homeModel.rotation.y += 0.001;
             // model.scale.set(0.3, 0.3, 0.3);
         }
         controls.update();
