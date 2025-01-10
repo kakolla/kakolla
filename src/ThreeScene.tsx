@@ -277,6 +277,7 @@ function ThreeScene({ pageState, setPage}: Props) {
         }
 
     }
+    requestAnimationFrame(animate);
 
 
     // double check if webGL is compatible (from three js docs)
@@ -286,7 +287,7 @@ function ThreeScene({ pageState, setPage}: Props) {
         const warning = WebGL.getWebGL2ErrorMessage();
         document.getElementById('root')?.appendChild(warning);
     }
-}, []);
+}, [homeModel]);
 
     // use Ref hook to create a container that renderer.domElement (HTMLCanvasElement) can be added to
     const containerRef = useRef<HTMLDivElement>(null); // create reference to this div element (JSX Element)
