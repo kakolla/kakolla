@@ -26,6 +26,7 @@ interface Props {
 
 
 function ThreeScene({ pageState, setPage }: Props) {
+    // refs to keep track of same references through component's life
     console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);
     const [homeModel, setHomeModel] = useState<THREE.Object3D | null>(null);
@@ -35,7 +36,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     const rendererRef = useRef<THREE.WebGLRenderer>();
     const controlsRef = useRef<OrbitControls>();
 
-    // add particles
+    // variables for the particle object
     const clockRef = useRef<Clock>(new Clock()); // for animations
     const animMixerRef = useRef<AnimationMixer>(); // for now, for particle animation
     const particlesRef = useRef<THREE.Object3D>();
@@ -99,17 +100,6 @@ function ThreeScene({ pageState, setPage }: Props) {
 
         return () => {
             isMounted = false;
-            // homeModel?.traverse((child) => {
-            //     if ((child as any).material) {
-            //         (child as any).material.dispose();
-            //     }
-            //     if ((child as any).geometry) {
-            //         (child as any).geometry.dispose();
-            //     }
-            //     if ((child as any).texture) {
-            //         (child as any).texture.dispose();
-            //     }
-            // });
             if (homeModelRef.current) {
                 console.log("removing home");
                 sceneRef.current?.remove(homeModelRef.current);
@@ -155,7 +145,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     }, []); // only run once on mount
 
 
-
+    // add lighting
     useEffect(() => {
 
 
@@ -169,6 +159,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     }, []);
 
 
+    // add post processing effects
     useEffect(() => {
 
 
@@ -187,6 +178,7 @@ function ThreeScene({ pageState, setPage }: Props) {
 
 
 
+    // Render loops
     useEffect(() => {
         requestAnimationFrame(function render() {
 
@@ -242,7 +234,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     }, []);
 
 
-    // // react to pageState changes
+    // react to pageState changes
     useEffect(() => {
         if (!controlsRef.current) return;
         const targetPosition = new THREE.Vector3();
