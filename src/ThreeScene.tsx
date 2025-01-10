@@ -13,9 +13,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // post processing
 import { BlendFunction, BloomEffect, EffectComposer, EffectPass, NoiseTexture, RenderPass } from "postprocessing";
 import { NoiseEffect } from 'postprocessing';
-import { GlitchEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
-import React from 'react';
 
 
 async function loadObject(path: string): Promise<THREE.Object3D> {
@@ -83,40 +81,60 @@ async function loadObjectWithAnimation(path: string, scene: THREE.Scene): Promis
         );
     });
 }
+interface Props {
+    pageState: string;
+    setPage: Function;
+}
 
-function ThreeScene() {
-    console.log("mounting ThreeScene component");
+
+
+function ThreeScene({ pageState, setPage}: Props) {
+    console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);
     const [homeModel, setHomeModel] = useState<THREE.Object3D | null>(null);
 
+    const sceneRef = useRef<THREE.Scene>();
+    const cameraRef = useRef<THREE.Camera>();
+    const rendererRef = useRef<THREE.WebGLRenderer>();
+    const controlsRef = useRef<OrbitControls>();
 
+    // add particles
+    const clockRef = useRef<Clock>(new Clock()); // for animations
+    const animMixerRef = useRef<AnimationMixer>(); // for now, for particle animation
+    const particlesRef = useRef<THREE.Object3D>();
 
+    let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
+
+    
     // set up scene, camera, and renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth /
+    useEffect(() => {
+    
+    sceneRef.current = new THREE.Scene();
+    cameraRef.current = new THREE.PerspectiveCamera(55, window.innerWidth /
         window.innerHeight, 0.1, 2000);
 
 
     // turn on antialiasing: {antialias: true} inside WebGLRenderer()
-    const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance", antialias: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    rendererRef.current = new THREE.WebGLRenderer({ powerPreference: "high-performance", antialias: false });
+    rendererRef.current.setSize(window.innerWidth, window.innerHeight);
+    rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
 
-    addEventListener("resize", () => { renderer.setSize(window.innerWidth, window.innerHeight); });
+    addEventListener("resize", () => { rendererRef.current!.setSize(window.innerWidth, window.innerHeight); });
 
 
 
-
+        
     // adding controls for camera
-    const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.z = 4;
-    camera.position.x = 0;
-    camera.position.y = 2;
-    controls.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
-    controls.enableDamping = true;
-    controls.maxDistance = 10;
+    controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
+    cameraRef.current.position.x = 0;
+    cameraRef.current.position.y = 2;
+    cameraRef.current.position.z = 4;
+    controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
+    controlsRef.current.enableDamping = true;
+    controlsRef.current.maxDistance = 10;
 
+}, []);
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
     // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
@@ -131,7 +149,7 @@ function ThreeScene() {
                 const loadedModel = await loadObject('public/home/home.gltf');
                 if (isMounted)
                 {
-                    scene.add(loadedModel);
+                    sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
                     homeModelRef.current = loadedModel;
 
@@ -159,7 +177,7 @@ function ThreeScene() {
             // });
             if (homeModelRef.current){
                 console.log("removing home");
-                scene.remove(homeModelRef.current);
+                sceneRef.current?.remove(homeModelRef.current);
             }
 
         }
@@ -167,10 +185,6 @@ function ThreeScene() {
 
 
 
-    // add particles
-    const clock = new Clock(); // for animations
-    let animMixer: AnimationMixer; // for now, for particle animation
-    let particles: THREE.Object3D | null = null;
 
 
 
@@ -178,8 +192,8 @@ function ThreeScene() {
     useEffect(() => {
         async function loadModel() {
             try {
-                [particles, animMixer] = await loadObjectWithAnimation('public/particles/scene.gltf', scene);
-                scene.add(particles);
+                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('public/particles/scene.gltf', sceneRef.current!);
+                sceneRef.current?.add(particlesRef.current);
             } catch (error) {
                 console.error("Error loading model with animation:", error);
             }
@@ -188,8 +202,8 @@ function ThreeScene() {
 
         // cleanup
         return () => {
-            if (particles) {
-                particles.traverse((child) => {
+            if (particlesRef.current) {
+                particlesRef.current.traverse((child) => {
                     if ((child as any).material) {
                         (child as any).material.dispose();
                     }
@@ -200,36 +214,45 @@ function ThreeScene() {
                         (child as any).texture.dispose();
                     }
                 });
-                scene.remove(particles);
+                sceneRef.current?.remove(particlesRef.current);
             }
         };
     }, []); // only run once on mount
 
 
 
+    useEffect(() => {
+
+    
     const light = new THREE.AmbientLight(0xffffff, 0.01);
-    scene.add(light);
+    sceneRef.current?.add(light);
 
     const pl = new THREE.PointLight(0xffffff, 5, 3, 2);
     pl.position.set(-0.5, 2, 0);
     // const dlHelper = new THREE.PointLightHelper(dl, 1);
-    scene.add(pl);
+    sceneRef.current?.add(pl);
+}, []);
 
 
+    useEffect(() => {
+
+    
     // post processing effects
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new EffectPass(camera, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
+    composer = new EffectComposer(rendererRef.current);
+    composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
+    composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
     const noiseEffect = new NoiseEffect({
         blendFunction: BlendFunction.SCREEN, 
         premultiply: true,
     });
     
     noiseEffect.blendMode.opacity.value = 0.75; // control strength of effect    
-    composer.addPass(new EffectPass(camera, noiseEffect));
+    composer.addPass(new EffectPass(cameraRef.current, noiseEffect));
 
 
-    
+
+
+
     requestAnimationFrame(function render() {
 
         requestAnimationFrame(render);
@@ -238,49 +261,77 @@ function ThreeScene() {
         if (homeModel) {
             homeModel.rotation.y += 0.001;
         }
-        controls.update(); // camera controls update
+        controlsRef.current?.update(); // camera controls update
     });
 
 
 
+    
 
     // animation loop
     function animate() {
-        const deltaTime = clock.getDelta();
-        if (animMixer) {
-            animMixer.update(deltaTime); // Update animation mixer for particle animations
-            animMixer.timeScale = 0.1;
+        const deltaTime = clockRef.current.getDelta();
+        if (animMixerRef.current) {
+            animMixerRef.current.update(deltaTime); // Update animation mixer for particle animations
+            animMixerRef.current.timeScale = 0.1;
         }
 
     }
 
+
     // double check if webGL is compatible (from three js docs)
     if (WebGL.isWebGL2Available()) {
-        renderer.setAnimationLoop(animate);
+        rendererRef.current!.setAnimationLoop(animate);
     } else {
         const warning = WebGL.getWebGL2ErrorMessage();
         document.getElementById('root')?.appendChild(warning);
     }
+}, []);
 
     // use Ref hook to create a container that renderer.domElement (HTMLCanvasElement) can be added to
     const containerRef = useRef<HTMLDivElement>(null); // create reference to this div element (JSX Element)
 
     useEffect(() => {
         if (containerRef.current) {
-            containerRef.current.appendChild(renderer.domElement);
+            containerRef.current.appendChild(rendererRef.current!.domElement);
         }
 
         // cleanup when component is deleted
         return () => {
             if (containerRef.current) {
-                containerRef.current.removeChild(renderer.domElement);
+                containerRef.current.removeChild(rendererRef.current!.domElement);
             }
         };
 
     }, []);
 
+
+    // // react to pageState changes
+    // useEffect(() => {
+    //     console.log("moving camera", pageState);
+    //     if (!controls) return;
+    //     const targetPosition = new THREE.Vector3();
+    //     switch (pageState) {
+    //         case "home":
+    //             targetPosition.set(0, 2, 4);
+    //             break;
+    //         case "stuff":
+    //             targetPosition.set(0, 2, 1);
+    //             break;
+    //         default:
+    //             targetPosition.set(0, 2, 4);
+
+
+    //     }
+
+    //     camera.position.x = targetPosition.x;
+    //     camera.position.y = targetPosition.y;
+    //     camera.position.z = targetPosition.z;
+    // }, [pageState]);
+
     // console.log(window.innerWidth + 'x' + window.innerHeight);
     return <div className="" ref={containerRef}></div>;
 }
 
-export default React.memo(ThreeScene); // memo makes sure component doesn't re-render if parent re-renders unless props of this comp changes
+// export default React.memo(ThreeScene); // memo makes sure component doesn't re-render if parent re-renders unless props of this comp changes
+export default ThreeScene;
