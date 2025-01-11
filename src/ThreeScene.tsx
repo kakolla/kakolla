@@ -24,6 +24,7 @@ interface Props {
 }
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
+import Projects from './Projects.tsx';
 
 
 function ThreeScene({ pageState, setPage }: Props) {
@@ -86,7 +87,6 @@ function ThreeScene({ pageState, setPage }: Props) {
         controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
 
-        setProjList(oldList => [...oldList, "public/display/poster.png"]);
         // console.log(projList);
 
     }, []);
@@ -324,6 +324,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     useEffect(() => {
         if (!controlsRef.current) return;
         const targetPosition = new THREE.Vector3();
+        // positions for the orbit camera
         switch (pageState) {
             case "home":
                 targetPosition.set(0, 0.5, 0);
@@ -409,7 +410,10 @@ function ThreeScene({ pageState, setPage }: Props) {
 
     function nextProject()
     {
+        if (projCount === projList.length) return;
         console.log(projCount+1);
+        console.log(projList.length);
+        console.log(projList);
         setProjCount(projCount+1);
 
     }
@@ -436,6 +440,7 @@ function ThreeScene({ pageState, setPage }: Props) {
         onClick={prevProject}>
             Prev
         </button>
+        <Projects projCount={projCount} />
             </>
             }
     </div>;

@@ -10,7 +10,7 @@ function About({ pageState} : Props) {
     {
         return <div className="absolute top-1/2 left-20 text-white overflow-y-auto no-scrollbar h-1/3">
             <h2>
-                milk
+                coming soon..
             </h2>
 
 

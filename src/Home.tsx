@@ -1,3 +1,4 @@
+import React from "react";
 
 
 interface Props {
@@ -39,4 +40,4 @@ function Home({ pageState }: Props) {
 }
 
 
-export default Home;
+export default React.memo(Home);
