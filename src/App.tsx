@@ -16,7 +16,6 @@ function App() {
         <About pageState={state} />
         <ThreeScene pageState={state} setPage={setState}/>
         <NavBar pageState={state} onClickFunc={setState}/>
-
     </>
 
 

@@ -23,9 +23,15 @@ interface Props {
     setPage: Function;
 }
 
+import * as TWEEN from "three/addons/libs/tween.module.js";
 
 
 function ThreeScene({ pageState, setPage }: Props) {
+
+    const projects = ["public/display/poster0.png", "public/display/poster1.png"];
+
+    const [projCount, setProjCount] = useState<number>(0);
+    const [projList, setProjList] = useState<string[]>(projects); // first poster
     // refs to keep track of same references through component's life
     console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);
@@ -43,10 +49,15 @@ function ThreeScene({ pageState, setPage }: Props) {
     const animMixerRef = useRef<AnimationMixer>(); // for now, for particle animation
     const particlesRef = useRef<THREE.Object3D>();
 
+    // refs for decal
+    const decalMeshRef = useRef<THREE.Mesh>();
+
+
+    
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
 
 
-    // set up scene, camera, and renderer
+    // set up scene, camera, and renderer & project list
     useEffect(() => {
 
         sceneRef.current = new THREE.Scene();
@@ -73,6 +84,10 @@ function ThreeScene({ pageState, setPage }: Props) {
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
         controlsRef.current.maxDistance = 7;
+        controlsRef.current.minDistance = 3;
+
+        setProjList(oldList => [...oldList, "public/display/poster.png"]);
+        // console.log(projList);
 
     }, []);
     // set up test cube
@@ -92,16 +107,16 @@ function ThreeScene({ pageState, setPage }: Props) {
     useEffect(() => {
         console.log("loading display");
         let isMounted = true;
-        async function loadCar() {
+        async function loadDisplay() {
             try {
                 const loadedModel = await loadObject('public/display/floor.gltf', sceneRef.current!);
 
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
                     loadedModel.position.set(-8, 0, 2);
-                    // projModelRef.current = loadedModel;
+                    projModelRef.current = loadedModel;
 
-                    const decalPath = "public/display/poster2.png";
+                    const decalPath = projList[projCount];
 
                     const decalPosition = new THREE.Vector3(0, 0, 0);
                     const decalOrientation = new THREE.Euler(0, Math.PI / 2, 0);
@@ -122,34 +137,38 @@ function ThreeScene({ pageState, setPage }: Props) {
 
                     );
 
-                    const decalMesh = new THREE.Mesh(decalGeometry, decalMaterial);
+                    decalMeshRef.current = new THREE.Mesh(decalGeometry, decalMaterial);
 
 
                     // Add the decal mesh to the scene
-                    console.log('decal mesh is ' + decalMesh)
-                    decalMesh.scale.set(2, 2.2, 3.911);
-                    decalMesh.position.set(-8, 1.5, 2);
-                    sceneRef.current!.add(decalMesh);
+                    console.log('decal mesh is ' + decalMeshRef.current)
+                    decalMeshRef.current.scale.set(2, 2.2, 3.911);
+                    decalMeshRef.current.position.set(-8, 1.5, 2);
+                    sceneRef.current!.add(decalMeshRef.current);
 
                 }
             } catch (error) {
                 console.log("error loading model");
             }
         }
-        loadCar();
+        loadDisplay();
+
+        // cleanup function
         return () => {
             isMounted = false;
             if (projModelRef.current) {
-                console.log("removing display");
+                console.log("removing display ref");
                 sceneRef.current?.remove(projModelRef.current);
+
             }
+            sceneRef.current?.remove(decalMeshRef.current!)
 
         }
 
 
 
 
-    }, []);
+    }, [projCount]);
 
     // load obj using hook (only once)
     useEffect(() => {
@@ -222,9 +241,9 @@ function ThreeScene({ pageState, setPage }: Props) {
 
         const plDisplay = new THREE.PointLight(0xffffff, 5, 4, 0.1);
         plDisplay.position.set(-7, 3.5, 2);
-        const dlHelper = new THREE.PointLightHelper(plDisplay, 1);
+        // const dlHelper = new THREE.PointLightHelper(plDisplay, 1);
 
-        sceneRef.current?.add(plDisplay, dlHelper);
+        sceneRef.current?.add(plDisplay);
     }, []);
 
 
@@ -269,6 +288,7 @@ function ThreeScene({ pageState, setPage }: Props) {
                 animMixerRef.current.timeScale = 0.1;
             }
 
+            TWEEN.update();
         }
         requestAnimationFrame(animate);
 
@@ -308,6 +328,9 @@ function ThreeScene({ pageState, setPage }: Props) {
             case "home":
                 targetPosition.set(0, 0.5, 0);
                 break;
+            case "about":
+                targetPosition.set(0, 0, 0);
+                break;
             case "stuff":
                 targetPosition.set(-8, 1.5, 2);
                 break;
@@ -330,6 +353,26 @@ function ThreeScene({ pageState, setPage }: Props) {
             return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         }
 
+        // tween function to quadratically end when zooming in
+        // TWEEN.update() must run in animation loop
+        function tween(inout: boolean) { // in - true, out - false
+            console.log("tweeing");
+            let desiredDistance = inout ? controlsRef.current!.minDistance : 7;
+
+            let dir = new THREE.Vector3();
+            cameraRef.current!.getWorldDirection(dir);
+            dir.negate();
+            let dist = controlsRef.current!.getDistance();
+
+            new TWEEN.Tween({ val: dist })
+                .to({ val: desiredDistance }, 2000)
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(val => {
+                    cameraRef.current!.position.copy(controlsRef.current!.target).addScaledVector(dir, val.val);
+                })
+                .start();
+        }
+
         function travelTowardsAnimation() {
             const elapsed = performance.now() - startTime;
             let t = Math.min(elapsed / duration, 1); // normalized time from 0 to 1
@@ -340,16 +383,18 @@ function ThreeScene({ pageState, setPage }: Props) {
             if (t < 1) {
                 requestAnimationFrame(travelTowardsAnimation);
             }
+            else {
+                // zoom in to min distance on the stuff (project) page
+                if (pageState === "stuff") {
+                    tween(true);
+                }
+            }
+
 
         }
 
         travelTowardsAnimation();
-        if (pageState === "stuff") {
-            controlsRef.current.maxDistance = 3;
-        }
-        else if (pageState === "home") {
-            controlsRef.current.maxDistance = 7;
-        }
+
 
     }, [pageState]);
 
@@ -362,8 +407,38 @@ function ThreeScene({ pageState, setPage }: Props) {
 
     }, [pageState]);
 
-    // console.log(window.innerWidth + 'x' + window.innerHeight);
-    return <div className="" ref={containerRef}></div>;
+    function nextProject()
+    {
+        console.log(projCount+1);
+        setProjCount(projCount+1);
+
+    }
+    function prevProject()
+    {
+        console.log(projCount-1 >= 0 ?  projCount-1 : "would be below 0");
+        if (projCount === 0) return;
+        setProjCount(projCount-1);
+
+    }
+
+
+    // component return statement
+    return <div className="" ref={containerRef}>
+        
+        {
+            pageState==="stuff" &&
+            <>
+        <button className="absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
+        onClick={nextProject}>
+            Next
+        </button>
+        <button className="absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+        onClick={prevProject}>
+            Prev
+        </button>
+            </>
+            }
+    </div>;
 }
 
 // export default React.memo(ThreeScene); // memo makes sure component doesn't re-render if parent re-renders unless props of this comp changes
