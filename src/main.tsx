@@ -4,14 +4,12 @@ import './index.css'
 // import App from './App.tsx'
 // import * as _THREE from 'three'
 
-import ThreeScene from './ThreeScene.tsx'
-import Title from './Title.tsx'
-import NavBar from './NavBar.tsx'
+
 import App from './App.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
+  <StrictMode>
     <App />
   // </StrictMode>,
 )

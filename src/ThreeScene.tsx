@@ -16,7 +16,7 @@ import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } fr
 import { NoiseEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 
-
+import { DecalGeometry } from 'three/examples/jsm/Addons.js';
 
 interface Props {
     pageState: string;
@@ -30,6 +30,8 @@ function ThreeScene({ pageState, setPage }: Props) {
     console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);
     const [homeModel, setHomeModel] = useState<THREE.Object3D | null>(null);
+    const projModelRef = useRef<THREE.Object3D | null>(null);
+
 
     const sceneRef = useRef<THREE.Scene>();
     const cameraRef = useRef<THREE.Camera>();
@@ -70,21 +72,91 @@ function ThreeScene({ pageState, setPage }: Props) {
         cameraRef.current.position.z = 4;
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
-        controlsRef.current.maxDistance = 10;
+        controlsRef.current.maxDistance = 7;
 
     }, []);
     // set up test cube
     // const geometry = new THREE.BoxGeometry( 1, 1, 1);
     // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00 });
     // const cube = new THREE.Mesh(geometry, material);
-    // scene.add( cube );
+    // if (sceneRef.current)
+    // {
+    //     cube.position.x = -8;
+    //     cube.position.y = 0;
+    //     cube.position.z = 2;
+
+    //     sceneRef.current.add( cube );
+    // }
+
+
+    useEffect(() => {
+        console.log("loading display");
+        let isMounted = true;
+        async function loadCar() {
+            try {
+                const loadedModel = await loadObject('public/display/floor.gltf', sceneRef.current!);
+
+                if (isMounted) {
+                    sceneRef.current?.add(loadedModel);
+                    loadedModel.position.set(-8, 0, 2);
+                    // projModelRef.current = loadedModel;
+
+                    const decalPath = "public/display/poster2.png";
+
+                    const decalPosition = new THREE.Vector3(0, 0, 0);
+                    const decalOrientation = new THREE.Euler(0, Math.PI / 2, 0);
+                    const geometry = new THREE.BoxGeometry(0.1, 2.25, 4);
+                    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                    const cube = new THREE.Mesh(geometry, material);
+                    cube.position.set(-8, 1.5, 2);
+                    sceneRef.current!.add(cube);
+                    const decalMaterial = new THREE.MeshStandardMaterial({
+                        map: new THREE.TextureLoader().load(decalPath),
+                        transparent: true,
+                    });
+
+                    const decalGeometry = new DecalGeometry(
+                        cube, // The model on which to project the decal
+                        decalPosition, // Position of the decal
+                        decalOrientation, // Pass the Euler directly
+
+                    );
+
+                    const decalMesh = new THREE.Mesh(decalGeometry, decalMaterial);
+
+
+                    // Add the decal mesh to the scene
+                    console.log('decal mesh is ' + decalMesh)
+                    decalMesh.scale.set(2, 2.2, 3.911);
+                    decalMesh.position.set(-8, 1.5, 2);
+                    sceneRef.current!.add(decalMesh);
+
+                }
+            } catch (error) {
+                console.log("error loading model");
+            }
+        }
+        loadCar();
+        return () => {
+            isMounted = false;
+            if (projModelRef.current) {
+                console.log("removing display");
+                sceneRef.current?.remove(projModelRef.current);
+            }
+
+        }
+
+
+
+
+    }, []);
 
     // load obj using hook (only once)
     useEffect(() => {
         let isMounted = true;
         async function loadHome() {
             try {
-                const loadedModel = await loadObject('public/home/home.gltf');
+                const loadedModel = await loadObject('public/home/home.gltf', sceneRef.current!);
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
@@ -128,17 +200,7 @@ function ThreeScene({ pageState, setPage }: Props) {
         // cleanup
         return () => {
             if (particlesRef.current) {
-                particlesRef.current.traverse((child) => {
-                    if ((child as any).material) {
-                        (child as any).material.dispose();
-                    }
-                    if ((child as any).geometry) {
-                        (child as any).geometry.dispose();
-                    }
-                    if ((child as any).texture) {
-                        (child as any).texture.dispose();
-                    }
-                });
+                console.log("removing particles");
                 sceneRef.current?.remove(particlesRef.current);
             }
         };
@@ -149,6 +211,7 @@ function ThreeScene({ pageState, setPage }: Props) {
     useEffect(() => {
 
 
+        // const light = new THREE.AmbientLight(0xffffff, 4);
         const light = new THREE.AmbientLight(0xffffff, 0.01);
         sceneRef.current?.add(light);
 
@@ -156,6 +219,12 @@ function ThreeScene({ pageState, setPage }: Props) {
         pl.position.set(-0.5, 2, 0);
         // const dlHelper = new THREE.PointLightHelper(dl, 1);
         sceneRef.current?.add(pl);
+
+        const plDisplay = new THREE.PointLight(0xffffff, 5, 4, 0.1);
+        plDisplay.position.set(-7, 3.5, 2);
+        const dlHelper = new THREE.PointLightHelper(plDisplay, 1);
+
+        sceneRef.current?.add(plDisplay, dlHelper);
     }, []);
 
 
@@ -166,7 +235,7 @@ function ThreeScene({ pageState, setPage }: Props) {
         // post processing effects
         composer = new EffectComposer(rendererRef.current);
         composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
-        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
+        // composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
         const noiseEffect = new NoiseEffect({
             blendFunction: BlendFunction.SCREEN,
             premultiply: true,
@@ -175,6 +244,7 @@ function ThreeScene({ pageState, setPage }: Props) {
         noiseEffect.blendMode.opacity.value = 0.75; // control strength of effect    
         composer.addPass(new EffectPass(cameraRef.current, noiseEffect));
     }, []);
+
 
 
 
@@ -190,10 +260,6 @@ function ThreeScene({ pageState, setPage }: Props) {
             }
             controlsRef.current?.update(); // camera controls update
         });
-
-
-
-
 
         // animation loop
         function animate() {
@@ -240,23 +306,60 @@ function ThreeScene({ pageState, setPage }: Props) {
         const targetPosition = new THREE.Vector3();
         switch (pageState) {
             case "home":
-                targetPosition.set(0, 2, 4);
+                targetPosition.set(0, 0.5, 0);
                 break;
             case "stuff":
-                targetPosition.set(0, 2, 1);
+                targetPosition.set(-8, 1.5, 2);
                 break;
             default:
-                targetPosition.set(0, 2, 4);
+                targetPosition.set(0, 0, 0);
 
 
         }
-        console.log("moving camera to ", pageState, targetPosition);
+        console.log("Smoothly moving camera to ", pageState, targetPosition);
 
-        cameraRef.current!.position.y = targetPosition.y;
-        cameraRef.current!.position.x = targetPosition.x;
-        cameraRef.current!.position.z = targetPosition.z;
-        cameraRef.current!.position.lerp(targetPosition, 0.3); // Smooth transition
-        controlsRef.current.update(); // Update controls
+        const startTarget = controlsRef.current.target.clone();
+        const duration = 2000;
+        const startTime = performance.now();
+
+        // quadratic ease function for smoothening
+        function ease(t: number) {
+
+            // first half (0.5 s) ease in
+            // second hald (>0.5 s ) ease out
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        }
+
+        function travelTowardsAnimation() {
+            const elapsed = performance.now() - startTime;
+            let t = Math.min(elapsed / duration, 1); // normalized time from 0 to 1
+            t = ease(t);
+
+            controlsRef.current!.target.lerpVectors(startTarget, targetPosition, t);
+            controlsRef.current!.update();
+            if (t < 1) {
+                requestAnimationFrame(travelTowardsAnimation);
+            }
+
+        }
+
+        travelTowardsAnimation();
+        if (pageState === "stuff") {
+            controlsRef.current.maxDistance = 3;
+        }
+        else if (pageState === "home") {
+            controlsRef.current.maxDistance = 7;
+        }
+
+    }, [pageState]);
+
+    useEffect(() => {
+        if (pageState == "stuff") {
+            console.log("showing lights");
+
+        }
+
+
     }, [pageState]);
 
     // console.log(window.innerWidth + 'x' + window.innerHeight);
