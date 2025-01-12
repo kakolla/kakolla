@@ -10,7 +10,7 @@ function About({ pageState }: Props) {
     I'm currently focused on exploring new methods of computing that make reverse engineering the brain possible. 
     `
     if (pageState === "about") {
-        return <div className="absolute top-1/2 left-20 text-white overflow-y-auto no-scrollbar h-1/3 w-1/2">
+        return <div className="animate-fade absolute top-1/2 left-20 text-white overflow-y-auto no-scrollbar h-1/3 w-1/2">
             <h2>
                 {text}
             </h2>

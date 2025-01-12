@@ -6,7 +6,7 @@ interface Props {
 }
 function Home({ pageState }: Props) {
     if (pageState === "home") {
-        return <div className="absolute top-1/2 left-20  text-white overflow-y-auto no-scrollbar bottom-10">
+        return <div className="animate-fade absolute top-1/2 left-20  text-white overflow-y-auto no-scrollbar bottom-10">
             <h1 className="text-2xl">Hi there, I'm <p className="inline text-lime-600">Abi</p></h1>
             <h1 className="pt-4">I'm a Comp Sci Student at USC originally from Toronto.</h1>
             <br />

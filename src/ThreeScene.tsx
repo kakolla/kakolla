@@ -431,11 +431,11 @@ function ThreeScene({ pageState }: Props) {
         {
             pageState==="stuff" &&
             <>
-        <button className="absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
+        <button className="animate-fade absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
         onClick={nextProject}>
             Next
         </button>
-        <button className="absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+        <button className="animate-fade absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
         onClick={prevProject}>
             Prev
         </button>
