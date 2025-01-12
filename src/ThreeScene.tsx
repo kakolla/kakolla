@@ -108,7 +108,7 @@ function ThreeScene({ pageState }: Props) {
         let isMounted = true;
         async function loadDisplay() {
             try {
-                const loadedModel = await loadObject('public/display/floor.gltf', sceneRef.current!);
+                const loadedModel = await loadObject('display/floor.gltf', sceneRef.current!);
 
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
@@ -174,7 +174,7 @@ function ThreeScene({ pageState }: Props) {
         let isMounted = true;
         async function loadHome() {
             try {
-                const loadedModel = await loadObject('public/home/home.gltf', sceneRef.current!);
+                const loadedModel = await loadObject('home/home.gltf', sceneRef.current!);
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
@@ -207,7 +207,7 @@ function ThreeScene({ pageState }: Props) {
     useEffect(() => {
         async function loadModel() {
             try {
-                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('public/particles/scene.gltf', sceneRef.current!);
+                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('particles/scene.gltf', sceneRef.current!);
                 sceneRef.current?.add(particlesRef.current);
             } catch (error) {
                 console.error("Error loading model with animation:", error);
