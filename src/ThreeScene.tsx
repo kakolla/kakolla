@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 
-import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // Object loading functions from other file
@@ -12,7 +11,7 @@ import { loadObject } from '../src/ThreeFunctions.tsx';
 import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
 
 // post processing
-import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+import { BlendFunction, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { NoiseEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 
@@ -27,12 +26,12 @@ import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
 
 
-function ThreeScene({ pageState, setPage }: Props) {
+function ThreeScene({ pageState }: Props) {
 
-    const projects = ["public/display/poster0.png", "public/display/cleansweep.png", "public/display/curve.png", "public/display/roblox.png", "public/display/scribo.png"];
+    const projects = ["display/poster0.png", "display/cleansweep.png", "display/curve.png", "display/roblox.png", "display/scribo.png"];
 
     const [projCount, setProjCount] = useState<number>(0);
-    const [projList, setProjList] = useState<string[]>(projects); // first poster
+    const [projList] = useState<string[]>(projects); // first poster
     // refs to keep track of same references through component's life
     console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);

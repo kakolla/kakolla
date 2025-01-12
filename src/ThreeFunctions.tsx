@@ -1,7 +1,7 @@
 // File for functions used in ThreeScene
 
 import * as THREE from 'three';
-import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DecalGeometry } from 'three/examples/jsm/Addons.js';
 
 export async function loadObject(path: string, scene: THREE.Scene, decalPath?: string, pos?: THREE.Vector3): Promise<THREE.Object3D> {
