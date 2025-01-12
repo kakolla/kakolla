@@ -29,7 +29,7 @@ import Projects from './Projects.tsx';
 
 function ThreeScene({ pageState, setPage }: Props) {
 
-    const projects = ["public/display/poster0.png", "public/display/poster1.png"];
+    const projects = ["public/display/poster0.png", "public/display/cleansweep.png", "public/display/curve.png", "public/display/roblox.png", "public/display/scribo.png"];
 
     const [projCount, setProjCount] = useState<number>(0);
     const [projList, setProjList] = useState<string[]>(projects); // first poster
@@ -410,7 +410,7 @@ function ThreeScene({ pageState, setPage }: Props) {
 
     function nextProject()
     {
-        if (projCount === projList.length) return;
+        if (projCount === projList.length-1) return;
         console.log(projCount+1);
         console.log(projList.length);
         console.log(projList);
