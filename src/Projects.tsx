@@ -51,7 +51,7 @@ function Projects({ projCount }: Props) {
         link = "https://github.com/NESCOM-Lab/knowledgegraphs";
     }
     if (projCount === 3) {
-        header = "Mystical Memories - ROBLOX Game Jame winner 2024"
+        header = "Mystical Memories - ROBLOX Game Jam winner 2024"
         text = `
         Developed a memory training minigame in a team of 4 using a memory palace concept.
         I programmed the character model physics using Coroutines for parallel processing and Tweening for smooth animations, enhancing gameplay fluidity. 
