@@ -56,6 +56,7 @@ function ThreeScene({ pageState }: Props) {
     
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
 
+    
 
     // set up scene, camera, and renderer & project list
     useEffect(() => {
@@ -102,6 +103,9 @@ function ThreeScene({ pageState }: Props) {
     //     sceneRef.current.add( cube );
     // }
 
+    // Add grid helper
+    const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
+    sceneRef.current?.add(gridHelper);
 
     useEffect(() => {
         console.log("loading display");
