@@ -33,7 +33,6 @@ function ThreeScene({ pageState }: Props) {
     const [projCount, setProjCount] = useState<number>(0);
     const [projList] = useState<string[]>(projects); // first poster
     // refs to keep track of same references through component's life
-    console.log("mounting ThreeScene component?");
     const homeModelRef = useRef<THREE.Object3D | null>(null);
     const [homeModel, setHomeModel] = useState<THREE.Object3D | null>(null);
     const projModelRef = useRef<THREE.Object3D | null>(null);
@@ -108,7 +107,7 @@ function ThreeScene({ pageState }: Props) {
     sceneRef.current?.add(gridHelper);
 
     useEffect(() => {
-        console.log("loading display");
+        console.log("Loading display object");
         let isMounted = true;
         async function loadDisplay() {
             try {
@@ -151,7 +150,7 @@ function ThreeScene({ pageState }: Props) {
 
                 }
             } catch (error) {
-                console.log("error loading model");
+                console.log("Error loading model");
             }
         }
         loadDisplay();
@@ -160,7 +159,7 @@ function ThreeScene({ pageState }: Props) {
         return () => {
             isMounted = false;
             if (projModelRef.current) {
-                console.log("removing display ref");
+                console.log("Removing display object");
                 sceneRef.current?.remove(projModelRef.current);
 
             }
@@ -173,7 +172,7 @@ function ThreeScene({ pageState }: Props) {
 
     }, [projCount]);
 
-    // load obj using hook (only once)
+    // load Home obj using hook (only once)
     useEffect(() => {
         let isMounted = true;
         async function loadHome() {
@@ -214,7 +213,7 @@ function ThreeScene({ pageState }: Props) {
                 [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('particles/scene.gltf', sceneRef.current!);
                 sceneRef.current?.add(particlesRef.current);
             } catch (error) {
-                console.error("Error loading model with animation:", error);
+                console.error("Error loading particle model with animation:", error);
             }
         }
         loadModel();
@@ -222,7 +221,7 @@ function ThreeScene({ pageState }: Props) {
         // cleanup
         return () => {
             if (particlesRef.current) {
-                console.log("removing particles");
+                console.log("Removing particles object");
                 sceneRef.current?.remove(particlesRef.current);
             }
         };
@@ -343,7 +342,7 @@ function ThreeScene({ pageState }: Props) {
 
 
         }
-        console.log("Smoothly moving camera to ", pageState, targetPosition);
+        // console.log("Smoothly moving camera to ", pageState, targetPosition);
 
         const startTarget = controlsRef.current.target.clone();
         const duration = 2000;
@@ -402,27 +401,23 @@ function ThreeScene({ pageState }: Props) {
 
     }, [pageState]);
 
-    useEffect(() => {
-        if (pageState == "stuff") {
-            console.log("showing lights");
+    // useEffect(() => {
+    //     if (pageState == "stuff") {
+    //         console.log("showing lights");
 
-        }
+    //     }
 
 
-    }, [pageState]);
+    // }, [pageState]);
 
     function nextProject()
     {
         if (projCount === projList.length-1) return;
-        console.log(projCount+1);
-        console.log(projList.length);
-        console.log(projList);
         setProjCount(projCount+1);
 
     }
     function prevProject()
     {
-        console.log(projCount-1 >= 0 ?  projCount-1 : "would be below 0");
         if (projCount === 0) return;
         setProjCount(projCount-1);
 
