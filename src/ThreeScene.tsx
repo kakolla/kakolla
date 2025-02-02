@@ -28,7 +28,11 @@ import Projects from './Projects.tsx';
 
 function ThreeScene({ pageState }: Props) {
 
-    const projects = ["display/poster0.png", "display/cleansweep.png", "display/curve.png", "display/roblox.png", "display/scribo.png"];
+    const projects = ["models/display/poster0.png", 
+        "models/display/cleansweep.png", 
+        "models/display/curve.png", 
+        "models/display/roblox.png", 
+        "models/display/scribo.png"];
 
     const [projCount, setProjCount] = useState<number>(0);
     const [projList] = useState<string[]>(projects); // first poster
@@ -117,7 +121,7 @@ function ThreeScene({ pageState }: Props) {
         let isMounted = true;
         async function loadDisplay() {
             try {
-                const loadedModel = await loadObject('display/floor.gltf', sceneRef.current!);
+                const loadedModel = await loadObject('models/display/floor.gltf', sceneRef.current!);
 
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
@@ -183,7 +187,7 @@ function ThreeScene({ pageState }: Props) {
         let isMounted = true;
         async function loadHome() {
             try {
-                const loadedModel = await loadObject('home/home.gltf', sceneRef.current!);
+                const loadedModel = await loadObject('models/home/home.gltf', sceneRef.current!);
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
@@ -216,7 +220,7 @@ function ThreeScene({ pageState }: Props) {
     useEffect(() => {
         async function loadModel() {
             try {
-                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('particles/scene.gltf', sceneRef.current!);
+                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
                 sceneRef.current?.add(particlesRef.current);
             } catch (error) {
                 console.error("Error loading particle model with animation:", error);
