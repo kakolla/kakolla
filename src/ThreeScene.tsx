@@ -52,10 +52,10 @@ function ThreeScene({ pageState }: Props) {
     const decalMeshRef = useRef<THREE.Mesh>();
 
 
-    
+
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
 
-    
+
 
     // set up scene, camera, and renderer & project list
     useEffect(() => {
@@ -86,7 +86,16 @@ function ThreeScene({ pageState }: Props) {
         controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
 
+        // Add grid helper
+        const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
+        sceneRef.current?.add(gridHelper);
+
         // console.log(projList);
+
+        // cleanup
+        return () => {
+            window.removeEventListener("resize", () => { rendererRef.current!.setSize(window.innerWidth, window.innerHeight); });
+        }
 
     }, []);
     // set up test cube
@@ -102,9 +111,6 @@ function ThreeScene({ pageState }: Props) {
     //     sceneRef.current.add( cube );
     // }
 
-    // Add grid helper
-    const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-    sceneRef.current?.add(gridHelper);
 
     useEffect(() => {
         console.log("Loading display object");
@@ -359,7 +365,7 @@ function ThreeScene({ pageState }: Props) {
         // tween function to quadratically end when zooming in
         // TWEEN.update() must run in animation loop
         function tween(inout: boolean) { // in - true, out - false
-            console.log("tweeing");
+            console.log("Tweening");
             let desiredDistance = inout ? controlsRef.current!.minDistance : 7;
 
             let dir = new THREE.Vector3();
@@ -410,37 +416,35 @@ function ThreeScene({ pageState }: Props) {
 
     // }, [pageState]);
 
-    function nextProject()
-    {
-        if (projCount === projList.length-1) return;
-        setProjCount(projCount+1);
+    function nextProject() {
+        if (projCount === projList.length - 1) return;
+        setProjCount(projCount + 1);
 
     }
-    function prevProject()
-    {
+    function prevProject() {
         if (projCount === 0) return;
-        setProjCount(projCount-1);
+        setProjCount(projCount - 1);
 
     }
 
 
     // component return statement
     return <div className="" ref={containerRef}>
-        
+
         {
-            pageState==="stuff" &&
+            pageState === "stuff" &&
             <>
-        <button className="animate-fade absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
-        onClick={nextProject}>
-            Next
-        </button>
-        <button className="animate-fade absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
-        onClick={prevProject}>
-            Prev
-        </button>
-        <Projects projCount={projCount} />
+                <button className="animate-fade absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
+                    onClick={nextProject}>
+                    Next
+                </button>
+                <button className="animate-fade absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+                    onClick={prevProject}>
+                    Prev
+                </button>
+                <Projects projCount={projCount} />
             </>
-            }
+        }
     </div>;
 }
 
