@@ -287,8 +287,10 @@ function ThreeScene({ pageState }: Props) {
             composer.render();
 
             // if (homeModel) {
-                // homeModel.rotation.y += 0.001;
+                // homeModel.rotation.y += 0.0002;
             // }
+            controlsRef.current!.autoRotate = true;
+            controlsRef.current!.autoRotateSpeed = 0.05;
             controlsRef.current?.update(); // camera controls update
         });
 
