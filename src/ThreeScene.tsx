@@ -43,7 +43,7 @@ function ThreeScene({ pageState }: Props) {
 
 
     const sceneRef = useRef<THREE.Scene>();
-    const cameraRef = useRef<THREE.Camera>();
+    const cameraRef = useRef<THREE.PerspectiveCamera>();
     const rendererRef = useRef<THREE.WebGLRenderer>();
     const controlsRef = useRef<OrbitControls>();
 
@@ -56,12 +56,12 @@ function ThreeScene({ pageState }: Props) {
     const decalMeshRef = useRef<THREE.Mesh>();
 
 
-
+    // for post processing
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
 
 
 
-    // set up scene, camera, and renderer & project list
+    // set up scene, camera, and renderer
     useEffect(() => {
 
         sceneRef.current = new THREE.Scene();
@@ -82,13 +82,16 @@ function ThreeScene({ pageState }: Props) {
 
         // adding controls for camera
         controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
-        cameraRef.current.position.x = 0;
-        cameraRef.current.position.y = 2;
-        cameraRef.current.position.z = 4;
+        cameraRef.current.position.x = -20;
+        cameraRef.current.position.y = 20;
+        cameraRef.current.position.z = 65;
+        cameraRef.current.updateProjectionMatrix();
+
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
         // controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
+        controlsRef.current.target.set(100,-300,0);
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
@@ -289,8 +292,8 @@ function ThreeScene({ pageState }: Props) {
             // if (homeModel) {
                 // homeModel.rotation.y += 0.0002;
             // }
-            controlsRef.current!.autoRotate = true;
-            controlsRef.current!.autoRotateSpeed = 0.05;
+            // controlsRef.current!.autoRotate = true;
+            // controlsRef.current!.autoRotateSpeed = 0.05;
             controlsRef.current?.update(); // camera controls update
         });
 
