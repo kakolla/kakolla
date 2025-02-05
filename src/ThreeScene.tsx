@@ -11,7 +11,7 @@ import { loadObject } from '../src/ThreeFunctions.tsx';
 import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
 
 // post processing
-import { BlendFunction, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import { NoiseEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 
@@ -87,12 +87,12 @@ function ThreeScene({ pageState }: Props) {
         cameraRef.current.position.z = 4;
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
-        controlsRef.current.maxDistance = 7;
+        // controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-        sceneRef.current?.add(gridHelper);
+        // sceneRef.current?.add(gridHelper);
 
         // console.log(projList);
 
@@ -182,12 +182,12 @@ function ThreeScene({ pageState }: Props) {
 
     }, [projCount]);
 
-    // load Home obj using hook (only once)
+    // load Toronto object using hook (only once)
     useEffect(() => {
         let isMounted = true;
         async function loadHome() {
             try {
-                const loadedModel = await loadObject('models/home/home.gltf', sceneRef.current!);
+                const loadedModel = await loadObject('models/toronto/toronto.gltf', sceneRef.current!);
                 if (isMounted) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
@@ -243,12 +243,12 @@ function ThreeScene({ pageState }: Props) {
 
 
         // const light = new THREE.AmbientLight(0xffffff, 4);
-        const light = new THREE.AmbientLight(0xffffff, 0.01);
-        sceneRef.current?.add(light);
+        // const light = new THREE.AmbientLight(0xffffff, 0.01);
+        // sceneRef.current?.add(light);
 
-        const pl = new THREE.PointLight(0xffffff, 5, 3, 2);
-        pl.position.set(-0.5, 2, 0);
-        // const dlHelper = new THREE.PointLightHelper(dl, 1);
+        const pl = new THREE.PointLight(0xffffff, 0.2, 50, 0.2);
+        pl.position.set(0, 20, 0);
+        // const dlHelper = new THREE.PointLightHelper(pl, 1);
         sceneRef.current?.add(pl);
 
         const plDisplay = new THREE.PointLight(0xffffff, 5, 4, 0.1);
@@ -266,13 +266,13 @@ function ThreeScene({ pageState }: Props) {
         // post processing effects
         composer = new EffectComposer(rendererRef.current);
         composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
-        // composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 3, luminanceThreshold: .7, radius: 0.5 })));
+        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 1, luminanceThreshold: .7, radius: 0.5 })));
         const noiseEffect = new NoiseEffect({
             blendFunction: BlendFunction.SCREEN,
             premultiply: true,
         });
 
-        noiseEffect.blendMode.opacity.value = 0.75; // control strength of effect    
+        noiseEffect.blendMode.opacity.value = 0.90; // control strength of effect    
         composer.addPass(new EffectPass(cameraRef.current, noiseEffect));
     }, []);
 
@@ -286,9 +286,9 @@ function ThreeScene({ pageState }: Props) {
             requestAnimationFrame(render);
             composer.render();
 
-            if (homeModel) {
-                homeModel.rotation.y += 0.001;
-            }
+            // if (homeModel) {
+                // homeModel.rotation.y += 0.001;
+            // }
             controlsRef.current?.update(); // camera controls update
         });
 
