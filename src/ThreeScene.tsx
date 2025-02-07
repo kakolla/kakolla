@@ -96,7 +96,7 @@ function ThreeScene({ pageState }: Props) {
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-        // sceneRef.current?.add(gridHelper);
+        sceneRef.current?.add(gridHelper);
 
         // console.log(projList);
 
@@ -136,10 +136,11 @@ function ThreeScene({ pageState }: Props) {
 
                     const decalPosition = new THREE.Vector3(0, 0, 0);
                     const decalOrientation = new THREE.Euler(0, Math.PI / 2, 0);
-                    const geometry = new THREE.BoxGeometry(0.1, 2.25, 4);
+                    const geometry = new THREE.BoxGeometry(0.1, 1, 1.778);
                     const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
                     const cube = new THREE.Mesh(geometry, material);
-                    cube.position.set(-8, 1.5, 2);
+                    cube.position.set(-37, 6, 18.5);
+                    cube.rotation.y += 0.3;
                     sceneRef.current!.add(cube);
                     const decalMaterial = new THREE.MeshStandardMaterial({
                         map: new THREE.TextureLoader().load(decalPath),
