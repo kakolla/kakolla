@@ -25,6 +25,15 @@ canvas {
     scrollbar-width: none; /* Firefox */
   }
 }
+.highlighted-text {
+  background: rgba(0,0,0,0.7);
+  border-radius: 8px;
+  padding: 4px 6px;
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone; /* Safari */
+  line-height: 1.6; 
+}
 
 
 

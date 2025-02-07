@@ -92,6 +92,7 @@ function ThreeScene({ pageState }: Props) {
         // controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
         controlsRef.current.target.set(100,-300,0);
+        controlsRef.current.panSpeed = 0.5;
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
