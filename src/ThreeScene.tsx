@@ -357,9 +357,11 @@ function ThreeScene({ pageState }: Props) {
         // positions for the orbit camera
         switch (pageState) {
             case "home":
+                controlsRef.current.minDistance = 65;
                 targetPosition.set(0, 0.5, 0);
                 break;
             case "stuff":
+                controlsRef.current.minDistance = 8;
                 targetPosition.set(-37, 6, 18.5);
                 break;
             case "about":
