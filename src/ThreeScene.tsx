@@ -67,9 +67,20 @@ function ThreeScene({ pageState }: Props) {
         about: number
     }={
         home: 80,
-        stuff: 8,
+        stuff: 1,
         about: 8
     };
+
+    let pageStateCamPositions: {
+        home: THREE.Vector3,
+        stuff: THREE.Vector3,
+        about: THREE.Vector3,
+    }={
+        home: new THREE.Vector3(0,0,0),
+        stuff: new THREE.Vector3(-37, 6, 17.8),
+        about: new THREE.Vector3(0,0,0)
+
+    }
 
 
     // set up scene, camera, and renderer
@@ -353,16 +364,19 @@ function ThreeScene({ pageState }: Props) {
     // react to pageState changes
     useEffect(() => {
         if (!controlsRef.current) return;
-        const targetPosition = new THREE.Vector3();
+        let targetPosition = new THREE.Vector3();
         // positions for the orbit camera
         switch (pageState) {
             case "home":
-                controlsRef.current.minDistance = 65;
+                // controlsRef.current.minDistance = 65;
+                cameraRef.current!.position.set(-20, 20, 65);
                 targetPosition.set(0, 0.5, 0);
                 break;
             case "stuff":
-                controlsRef.current.minDistance = 8;
-                targetPosition.set(-37, 6, 18.5);
+                // controlsRef.current.minDistance = 8;
+                targetPosition = ((pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]));
+                // cameraRef.current!.position.set(-37, 10, 18.5);
+                // cameraRef.current!.lookAt(0, 0, 0);
                 break;
             case "about":
                 targetPosition.set(0, 50, 0);
@@ -376,6 +390,7 @@ function ThreeScene({ pageState }: Props) {
         // console.log("Smoothly moving camera to ", pageState, targetPosition);
 
         const startTarget = controlsRef.current.target.clone();
+        console.log('target is!', startTarget)
         const duration = 2000;
         const startTime = performance.now();
 
@@ -400,7 +415,7 @@ function ThreeScene({ pageState }: Props) {
             // interpolate maxDistance smoothly if it's not the homepage
             // would error since homepage has no maxDistance defined
             if (newMaxDistance != -1) {
-                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.1;
+                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.02;
             }
             controlsRef.current!.update();
 
@@ -411,6 +426,14 @@ function ThreeScene({ pageState }: Props) {
                 // this asserts that the string pageState is definitely one of the keys in the dict
                 controlsRef.current!.maxDistance = pageStateMaxDistances[
                     pageState as keyof typeof pageStateMaxDistances];
+
+                // ending target position (where camera looks at)
+                if (pageState === "stuff") {
+                    // cameraRef.current!.lookAt(-37, 6, 18.5);
+                    controlsRef.current!.target = (pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]);
+                    cameraRef.current!.position.set(-50, 10, 17.8);
+                    controlsRef.current!.update();
+                }
             }
         }
         // when home is loaded, maxDistance hasn't been initialized (otherwise it would 
