@@ -273,8 +273,8 @@ function ThreeScene({ pageState }: Props) {
         // const light = new THREE.AmbientLight(0xffffff, 0.01);
         // sceneRef.current?.add(light);
 
-        const pl = new THREE.PointLight(0xffffff, 0.2, 50, 0.2);
-        pl.position.set(0, 20, 0);
+        const pl = new THREE.PointLight(0xffffff, 1.3, 50, 0.2);
+        pl.position.set(-38, 7, 19);
         // const dlHelper = new THREE.PointLightHelper(pl, 1);
         sceneRef.current?.add(pl);
 
@@ -415,7 +415,7 @@ function ThreeScene({ pageState }: Props) {
             // interpolate maxDistance smoothly if it's not the homepage
             // would error since homepage has no maxDistance defined
             if (newMaxDistance != -1) {
-                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.02;
+                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.03;
             }
             controlsRef.current!.update();
 
