@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import ProjectBlurb from "./ProjectBlurb";
 
 
 interface Props {
@@ -6,10 +7,7 @@ interface Props {
 }
 
 function Projects({ projCount }: Props) {
-
-    // let text: string | null = null;
-    // let header: string | null = null;
-    // let link: string | null = null;
+    
     let texts: string[] = [];
     let headers: string[] = [];
     let links: string[] = [];
@@ -74,72 +72,12 @@ function Projects({ projCount }: Props) {
     
 
     return <div ref={containerRef} className="highlighted-text w-1/3 animate-fade absolute top-1/3 left-20 text-white overflow-y-auto no-scrollbar bottom-10">
-        <h1 className="text-2xl w-2/3">
-            {headers[0]}
-        </h1>
-        <h2 className=" pt-2 max-w-xl">
-            {texts[0]}
-        </h2>
-        <br />
-        <a className=" pt-2 max-w-xl" href={links[0]!} target="_blank">
-            Link
-        </a>
-
-        <br />
-        <br />
-        <h1 className="text-2xl w-2/3">
-            {headers[1]}
-        </h1>
-        <h2 className=" pt-2 max-w-xl">
-            {texts[1]}
-        </h2>
-        <br />
-        <a className=" pt-2 max-w-xl" href={links[1]!} target="_blank">
-            Link
-        </a>
-
-        <br />
-        <br />
-        <h1 className="text-2xl w-2/3">
-            {headers[2]}
-        </h1>
-        <h2 className=" pt-2 max-w-xl">
-            {texts[2]}
-        </h2>
-        <br />
-        <a className=" pt-2 max-w-xl" href={links[2]!} target="_blank">
-            Link
-        </a>
-
-
-        <br />
-        <br />
-        <h1 className="text-2xl w-2/3">
-            {headers[3]}
-        </h1>
-        <h2 className=" pt-2 max-w-xl">
-            {texts[3]}
-        </h2>
-        <br />
-        <a className=" pt-2 max-w-xl" href={links[3]!} target="_blank">
-            Link
-        </a>
-
-
-        <br />
-        <br />
-        <h1 className="text-2xl w-2/3">
-            {headers[4]}
-        </h1>
-        <h2 className=" pt-2 max-w-xl">
-            {texts[4]}
-        </h2>
-        <br />
-        <a className=" pt-2 max-w-xl" href={links[4]!} target="_blank">
-            Link
-        </a>
-
-
+        
+        <ProjectBlurb header={headers[0]} text={texts[0]} link={links[0]} addSpace={false}></ProjectBlurb>
+        <ProjectBlurb header={headers[1]} text={texts[1]} link={links[1]} addSpace={true}></ProjectBlurb>
+        <ProjectBlurb header={headers[2]} text={texts[2]} link={links[2]} addSpace={true}></ProjectBlurb>
+        <ProjectBlurb header={headers[3]} text={texts[3]} link={links[3]} addSpace={true}></ProjectBlurb>
+        <ProjectBlurb header={headers[4]} text={texts[4]} link={links[4]} addSpace={true}></ProjectBlurb>
 
     </div>
 
