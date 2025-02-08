@@ -1,17 +1,18 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ProjectBlurb from "./ProjectBlurb";
 
 
 interface Props {
     projCount: number;
+    setProjCountFunction: any
 }
 
-function Projects({ projCount }: Props) {
-    
+function Projects({ projCount, setProjCountFunction }: Props) {
     let texts: string[] = [];
     let headers: string[] = [];
     let links: string[] = [];
 
+    const [visibleComponentIndex, setVisibleComponentIndex] = useState<number>(0); // index of current visible component
 
     let containerRef = useRef<HTMLDivElement>(null);
 
@@ -69,18 +70,49 @@ function Projects({ projCount }: Props) {
     links.push("https://github.com/kakolla/Scribo");
 
 
+
+
+    // return <div ref={containerRef} className="highlighted-text w-1/3 animate-fade absolute top-1/3 left-20 text-white overflow-y-auto no-scrollbar bottom-10">
+
+    //     <ProjectBlurb header={headers[0]} text={texts[0]} link={links[0]} addSpace={false}></ProjectBlurb>
+    //     <ProjectBlurb header={headers[1]} text={texts[1]} link={links[1]} addSpace={true}></ProjectBlurb>
+    //     <ProjectBlurb header={headers[2]} text={texts[2]} link={links[2]} addSpace={true}></ProjectBlurb>
+    //     <ProjectBlurb header={headers[3]} text={texts[3]} link={links[3]} addSpace={true}></ProjectBlurb>
+    //     <ProjectBlurb header={headers[4]} text={texts[4]} link={links[4]} addSpace={true}></ProjectBlurb>
+
+    // </div>
+
+    useEffect(() => {
+        setProjCountFunction(visibleComponentIndex);
+        // projCount = visibleComponentIndex;
+    }, [visibleComponentIndex]);
+
+    return (
+        <div className="highlighted-text w-1/3 animate-fade absolute top-1/3 left-20 text-white overflow-y-auto no-scrollbar bottom-10">
+            {
+                headers.map((header, index) => (
+                    <ProjectBlurb
+                        key={index}
+                        header={header}
+                        text={texts[index]}
+                        link={links[index]}
+                        addSpace={index != 0}
+                        onVisible={setVisibleComponentIndex}
+                        headersList={headers}
+                    />
+                ))}
+
+            <p className="fixed top-5 left-5 bg-black text-white p-2">
+                Currently Viewing: {visibleComponentIndex}
+            </p>
+            <p className="fixed top-20 left-5 bg-black text-white p-2">
+                projCount : {projCount}
+            </p>
+
+        </div>
+
+    );
     
-
-    return <div ref={containerRef} className="highlighted-text w-1/3 animate-fade absolute top-1/3 left-20 text-white overflow-y-auto no-scrollbar bottom-10">
-        
-        <ProjectBlurb header={headers[0]} text={texts[0]} link={links[0]} addSpace={false}></ProjectBlurb>
-        <ProjectBlurb header={headers[1]} text={texts[1]} link={links[1]} addSpace={true}></ProjectBlurb>
-        <ProjectBlurb header={headers[2]} text={texts[2]} link={links[2]} addSpace={true}></ProjectBlurb>
-        <ProjectBlurb header={headers[3]} text={texts[3]} link={links[3]} addSpace={true}></ProjectBlurb>
-        <ProjectBlurb header={headers[4]} text={texts[4]} link={links[4]} addSpace={true}></ProjectBlurb>
-
-    </div>
-
 }
 
 

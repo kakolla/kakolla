@@ -1,19 +1,44 @@
+import { useEffect, useRef } from "react";
 
 
 interface Props {
     text: string,
     header: string,
     link: string
-    addSpace: boolean
+    addSpace: boolean,
+    onVisible: (index: number) => void; // callback func to notify that its visible
+    headersList: string[]
 }
 
 
 function ProjectBlurb(props: Props) {
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    // props.onVisible(props.header); // notify parent (Projects.tsx) that its visible
+                    console.log(props.header);
+                    console.log(props.headersList.indexOf(props.header));
+                    props.onVisible(props.headersList.indexOf(props.header)); // notify parent (Projects.tsx) that its visible
+                }
+            },
+            { threshold: 0.5 } // occurs when 50% of component is visible
+        );
+        
+        if (ref.current) observer.observe(ref.current);
+
+        // cleanup
+        return () => {
+            if (ref.current) observer.unobserve(ref.current);
+        };
+
+    }, [props.header]); // useEffect calls when header changes
 
 
 
-
-    return <>
+    return <div ref={ref}>
         {props.addSpace && <>
             <br />
             <br />
@@ -34,7 +59,7 @@ function ProjectBlurb(props: Props) {
         </a>
 
 
-    </>
+    </div>
 
 
 }

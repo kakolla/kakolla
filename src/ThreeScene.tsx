@@ -480,7 +480,7 @@ function ThreeScene({ pageState }: Props) {
                     onClick={prevProject}>
                     Prev
                 </button>
-                <Projects projCount={projCount} />
+                <Projects projCount={projCount} setProjCountFunction={setProjCount}/>
             </>
         }
     </div>;
