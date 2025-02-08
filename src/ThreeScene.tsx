@@ -24,14 +24,15 @@ interface Props {
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
+import { start } from 'repl';
 
 
 function ThreeScene({ pageState }: Props) {
 
-    const projects = ["models/display/poster0.png", 
-        "models/display/cleansweep.png", 
-        "models/display/curve.png", 
-        "models/display/roblox.png", 
+    const projects = ["models/display/poster0.png",
+        "models/display/cleansweep.png",
+        "models/display/curve.png",
+        "models/display/roblox.png",
         "models/display/scribo.png"];
 
     const [projCount, setProjCount] = useState<number>(0);
@@ -59,6 +60,16 @@ function ThreeScene({ pageState }: Props) {
     // for post processing
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
 
+    // Dict for max orbital control distances for each page
+    let pageStateMaxDistances: {
+        home: number,
+        stuff: number,
+        about: number
+    }={
+        home: 80,
+        stuff: 8,
+        about: 8
+    };
 
 
     // set up scene, camera, and renderer
@@ -89,10 +100,10 @@ function ThreeScene({ pageState }: Props) {
 
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
-        // controlsRef.current.maxDistance = 7;
         controlsRef.current.minDistance = 3;
-        controlsRef.current.target.set(100,-300,0);
-        controlsRef.current.panSpeed = 0.5;
+        controlsRef.current.target.set(100, -300, 0);
+        controlsRef.current.panSpeed = 0.8;
+        controlsRef.current.maxDistance = 2000;
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
@@ -348,14 +359,15 @@ function ThreeScene({ pageState }: Props) {
             case "home":
                 targetPosition.set(0, 0.5, 0);
                 break;
-            case "about":
-                targetPosition.set(0, 0, 0);
-                break;
             case "stuff":
-                targetPosition.set(-8, 1.5, 2);
+                targetPosition.set(-37, 6, 18.5);
+                break;
+            case "about":
+                targetPosition.set(0, 50, 0);
                 break;
             default:
                 targetPosition.set(0, 0, 0);
+                break;
 
 
         }
@@ -373,59 +385,46 @@ function ThreeScene({ pageState }: Props) {
             return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         }
 
-        // tween function to quadratically end when zooming in
-        // TWEEN.update() must run in animation loop
-        function tween(inout: boolean) { // in - true, out - false
-            console.log("Tweening");
-            let desiredDistance = inout ? controlsRef.current!.minDistance : 7;
 
-            let dir = new THREE.Vector3();
-            cameraRef.current!.getWorldDirection(dir);
-            dir.negate();
-            let dist = controlsRef.current!.getDistance();
-
-            new TWEEN.Tween({ val: dist })
-                .to({ val: desiredDistance }, 2000)
-                .easing(TWEEN.Easing.Quadratic.Out)
-                .onUpdate(val => {
-                    cameraRef.current!.position.copy(controlsRef.current!.target).addScaledVector(dir, val.val);
-                })
-                .start();
-        }
-
-        function travelTowardsAnimation() {
+        
+        function travelTowardsAnimation(newMaxDistance: number) {
             const elapsed = performance.now() - startTime;
-            let t = Math.min(elapsed / duration, 1); // normalized time from 0 to 1
+            let t = Math.min(elapsed / duration, 1);
             t = ease(t);
 
+            // interpolate camera target position
             controlsRef.current!.target.lerpVectors(startTarget, targetPosition, t);
+
+            // interpolate maxDistance smoothly if it's not the homepage
+            // would error since homepage has no maxDistance defined
+            if (newMaxDistance != -1) {
+                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.1;
+            }
             controlsRef.current!.update();
+
+
             if (t < 1) {
-                requestAnimationFrame(travelTowardsAnimation);
+                requestAnimationFrame(() => travelTowardsAnimation(newMaxDistance));
+            } else {
+                // this asserts that the string pageState is definitely one of the keys in the dict
+                controlsRef.current!.maxDistance = pageStateMaxDistances[
+                    pageState as keyof typeof pageStateMaxDistances];
             }
-            else {
-                // zoom in to min distance on the stuff (project) page
-                if (pageState === "stuff") {
-                    tween(true);
-                }
-            }
-
-
         }
-
-        travelTowardsAnimation();
+        // when home is loaded, maxDistance hasn't been initialized (otherwise it would 
+        // cause abrupt movement)
+        if (pageState != "home") {
+            travelTowardsAnimation(pageStateMaxDistances[
+                pageState as keyof typeof pageStateMaxDistances]);
+        }
+        else {
+            travelTowardsAnimation(-1);
+        }
 
 
     }, [pageState]);
 
-    // useEffect(() => {
-    //     if (pageState == "stuff") {
-    //         console.log("showing lights");
-
-    //     }
-
-
-    // }, [pageState]);
+    
 
     function nextProject() {
         if (projCount === projList.length - 1) return;
