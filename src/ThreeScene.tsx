@@ -156,8 +156,6 @@ function ThreeScene({ pageState }: Props) {
 
                     const decalPath = projList[projCount];
 
-                    const decalPosition = new THREE.Vector3(0, 0, 0);
-                    const decalOrientation = new THREE.Euler(0, Math.PI / 2, 0);
                     const geometry = new THREE.BoxGeometry(0.05, 1, 1.778);
                     const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
                     const cube = new THREE.Mesh(geometry, material);
