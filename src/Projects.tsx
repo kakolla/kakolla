@@ -72,7 +72,7 @@ function Projects({ projCount }: Props) {
         link = "https://github.com/kakolla/Scribo"
     }
 
-    return <div ref={containerRef} className="animate-fade absolute top-2/3 left-20 text-white overflow-y-auto no-scrollbar bottom-20">
+    return <div ref={containerRef} className="highlighted-text animate-fade absolute top-2/3 left-20 text-white overflow-y-auto no-scrollbar bottom-20">
         <h1 className="text-2xl w-2/3">
             {header}
         </h1>

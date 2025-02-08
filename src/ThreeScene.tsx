@@ -158,32 +158,13 @@ function ThreeScene({ pageState }: Props) {
 
                     const decalPosition = new THREE.Vector3(0, 0, 0);
                     const decalOrientation = new THREE.Euler(0, Math.PI / 2, 0);
-                    const geometry = new THREE.BoxGeometry(0.1, 1, 1.778);
+                    const geometry = new THREE.BoxGeometry(0.05, 1, 1.778);
                     const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
                     const cube = new THREE.Mesh(geometry, material);
                     cube.position.set(-37, 6, 18.5);
                     cube.rotation.y += 0.3;
                     sceneRef.current!.add(cube);
-                    // const decalMaterial = new THREE.MeshStandardMaterial({
-                    //     map: new THREE.TextureLoader().load(decalPath),
-                    //     transparent: true,
-                    // });
 
-                    // const decalGeometry = new DecalGeometry(
-                    //     cube, // The model on which to project the decal
-                    //     decalPosition, // Position of the decal
-                    //     decalOrientation, // Pass the Euler directly
-
-                    // );
-
-                    // decalMeshRef.current = new THREE.Mesh(decalGeometry, decalMaterial);
-
-
-                    // // Add the decal mesh to the scene
-                    // console.log('decal mesh is ' + decalMeshRef.current)
-                    // decalMeshRef.current.scale.set(2, 2.2, 3.911);
-                    // decalMeshRef.current.position.set(-8, 1.5, 2);
-                    // sceneRef.current!.add(decalMeshRef.current);
                     const decalTexture = new THREE.TextureLoader().load(decalPath);
 
                     // Create the material for the decal
@@ -199,7 +180,7 @@ function ThreeScene({ pageState }: Props) {
                     decalPlaneRef.current = new THREE.Mesh(planeGeometry, decalMaterial);
 
                     // set position
-                    decalPlaneRef.current.position.set(cube.position.x-0.06, cube.position.y, cube.position.z+0.02);
+                    decalPlaneRef.current.position.set(cube.position.x-0.03, cube.position.y, cube.position.z+0.02);
 
                     // rptate plane
                     decalPlaneRef.current.rotation.set(0, 0.3+3*(Math.PI)/2, 0); // Adjust rotation as needed
