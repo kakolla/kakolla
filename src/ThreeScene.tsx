@@ -67,7 +67,7 @@ function ThreeScene({ pageState }: Props) {
         about: number
     } = {
         home: 80,
-        stuff: 1,
+        stuff: 0,
         about: 8
     };
 
@@ -111,7 +111,7 @@ function ThreeScene({ pageState }: Props) {
 
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
-        controlsRef.current.minDistance = 3;
+        controlsRef.current.minDistance = 1.7;
         controlsRef.current.target.set(100, -300, 0);
         controlsRef.current.panSpeed = 0.8;
         controlsRef.current.maxDistance = 2000;
@@ -297,7 +297,7 @@ function ThreeScene({ pageState }: Props) {
         // const light = new THREE.AmbientLight(0xffffff, 0.01);
         // sceneRef.current?.add(light);
 
-        const pl = new THREE.PointLight(0xffffff, 1.3, 50, 0.2);
+        const pl = new THREE.PointLight(0xffffff, 6, 5, 3);
         pl.position.set(-38, 7, 19);
         // const dlHelper = new THREE.PointLightHelper(pl, 1);
         sceneRef.current?.add(pl);
