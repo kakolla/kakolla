@@ -192,19 +192,19 @@ function ThreeScene({ pageState }: Props) {
                         transparent: true,
                     });
 
-                    // Define the plane size (it should match the size of the area where you want the texture)
+                    // define the plane size 
                     const planeGeometry = new THREE.PlaneGeometry(1.778,1);  // Adjust size as needed
 
-                    // Create the plane mesh with the material
+                    // define plane ref
                     decalPlaneRef.current = new THREE.Mesh(planeGeometry, decalMaterial);
 
-                    // Position the plane over the cube (adjust the position based on your scene's setup)
+                    // set position
                     decalPlaneRef.current.position.set(cube.position.x-0.06, cube.position.y, cube.position.z+0.02);
 
-                    // Optionally, rotate the plane to match the orientation of the cube (if needed)
+                    // rptate plane
                     decalPlaneRef.current.rotation.set(0, 0.3+3*(Math.PI)/2, 0); // Adjust rotation as needed
 
-                    // Add the plane to the scene
+                    // add to scene
                     sceneRef.current!.add(decalPlaneRef.current);
 
 
