@@ -54,7 +54,7 @@ function ThreeScene({ pageState }: Props) {
     const particlesRef = useRef<THREE.Object3D>();
 
     // refs for decal
-    const decalMeshRef = useRef<THREE.Mesh>();
+    const decalPlaneRef = useRef<THREE.Mesh>();
 
 
     // for post processing
@@ -65,7 +65,7 @@ function ThreeScene({ pageState }: Props) {
         home: number,
         stuff: number,
         about: number
-    }={
+    } = {
         home: 80,
         stuff: 1,
         about: 8
@@ -75,10 +75,10 @@ function ThreeScene({ pageState }: Props) {
         home: THREE.Vector3,
         stuff: THREE.Vector3,
         about: THREE.Vector3,
-    }={
-        home: new THREE.Vector3(0,0,0),
+    } = {
+        home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 17.8),
-        about: new THREE.Vector3(0,0,0)
+        about: new THREE.Vector3(0, 0, 0)
 
     }
 
@@ -147,12 +147,12 @@ function ThreeScene({ pageState }: Props) {
         let isMounted = true;
         async function loadDisplay() {
             try {
-                const loadedModel = await loadObject('models/display/floor.gltf', sceneRef.current!);
+                // const loadedModel = await loadObject('models/display/floor.gltf', sceneRef.current!);
 
                 if (isMounted) {
-                    sceneRef.current?.add(loadedModel);
-                    loadedModel.position.set(-8, 0, 2);
-                    projModelRef.current = loadedModel;
+                    // sceneRef.current?.add(loadedModel);
+                    // loadedModel.position.set(-8, 0, 2);
+                    // projModelRef.current = loadedModel;
 
                     const decalPath = projList[projCount];
 
@@ -164,26 +164,50 @@ function ThreeScene({ pageState }: Props) {
                     cube.position.set(-37, 6, 18.5);
                     cube.rotation.y += 0.3;
                     sceneRef.current!.add(cube);
+                    // const decalMaterial = new THREE.MeshStandardMaterial({
+                    //     map: new THREE.TextureLoader().load(decalPath),
+                    //     transparent: true,
+                    // });
+
+                    // const decalGeometry = new DecalGeometry(
+                    //     cube, // The model on which to project the decal
+                    //     decalPosition, // Position of the decal
+                    //     decalOrientation, // Pass the Euler directly
+
+                    // );
+
+                    // decalMeshRef.current = new THREE.Mesh(decalGeometry, decalMaterial);
+
+
+                    // // Add the decal mesh to the scene
+                    // console.log('decal mesh is ' + decalMeshRef.current)
+                    // decalMeshRef.current.scale.set(2, 2.2, 3.911);
+                    // decalMeshRef.current.position.set(-8, 1.5, 2);
+                    // sceneRef.current!.add(decalMeshRef.current);
+                    const decalTexture = new THREE.TextureLoader().load(decalPath);
+
+                    // Create the material for the decal
                     const decalMaterial = new THREE.MeshStandardMaterial({
-                        map: new THREE.TextureLoader().load(decalPath),
+                        map: decalTexture,
                         transparent: true,
                     });
 
-                    const decalGeometry = new DecalGeometry(
-                        cube, // The model on which to project the decal
-                        decalPosition, // Position of the decal
-                        decalOrientation, // Pass the Euler directly
+                    // Define the plane size (it should match the size of the area where you want the texture)
+                    const planeGeometry = new THREE.PlaneGeometry(1.778,1);  // Adjust size as needed
 
-                    );
+                    // Create the plane mesh with the material
+                    decalPlaneRef.current = new THREE.Mesh(planeGeometry, decalMaterial);
 
-                    decalMeshRef.current = new THREE.Mesh(decalGeometry, decalMaterial);
+                    // Position the plane over the cube (adjust the position based on your scene's setup)
+                    decalPlaneRef.current.position.set(cube.position.x-0.06, cube.position.y, cube.position.z+0.02);
+
+                    // Optionally, rotate the plane to match the orientation of the cube (if needed)
+                    decalPlaneRef.current.rotation.set(0, 0.3+3*(Math.PI)/2, 0); // Adjust rotation as needed
+
+                    // Add the plane to the scene
+                    sceneRef.current!.add(decalPlaneRef.current);
 
 
-                    // Add the decal mesh to the scene
-                    console.log('decal mesh is ' + decalMeshRef.current)
-                    decalMeshRef.current.scale.set(2, 2.2, 3.911);
-                    decalMeshRef.current.position.set(-8, 1.5, 2);
-                    sceneRef.current!.add(decalMeshRef.current);
 
                 }
             } catch (error) {
@@ -200,7 +224,7 @@ function ThreeScene({ pageState }: Props) {
                 sceneRef.current?.remove(projModelRef.current);
 
             }
-            sceneRef.current?.remove(decalMeshRef.current!)
+            sceneRef.current?.remove(decalPlaneRef.current!)
 
         }
 
@@ -314,7 +338,7 @@ function ThreeScene({ pageState }: Props) {
             composer.render();
 
             // if (homeModel) {
-                // homeModel.rotation.y += 0.0002;
+            // homeModel.rotation.y += 0.0002;
             // }
             // controlsRef.current!.autoRotate = true;
             // controlsRef.current!.autoRotateSpeed = 0.05;
@@ -403,7 +427,7 @@ function ThreeScene({ pageState }: Props) {
         }
 
 
-        
+
         function travelTowardsAnimation(newMaxDistance: number) {
             const elapsed = performance.now() - startTime;
             let t = Math.min(elapsed / duration, 1);
@@ -449,7 +473,7 @@ function ThreeScene({ pageState }: Props) {
 
     }, [pageState]);
 
-    
+
 
     function nextProject() {
         if (projCount === projList.length - 1) return;
