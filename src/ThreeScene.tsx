@@ -276,16 +276,17 @@ function ThreeScene({ pageState }: Props) {
         // const light = new THREE.AmbientLight(0xffffff, 0.01);
         // sceneRef.current?.add(light);
 
+        // display light
         const pl = new THREE.PointLight(0xffffff, 6, 5, 3);
         pl.position.set(-38, 7, 19);
         // const dlHelper = new THREE.PointLightHelper(pl, 1);
         sceneRef.current?.add(pl);
 
-        const plDisplay = new THREE.PointLight(0xffffff, 5, 4, 0.1);
-        plDisplay.position.set(-7, 3.5, 2);
-        // const dlHelper = new THREE.PointLightHelper(plDisplay, 1);
 
-        sceneRef.current?.add(plDisplay);
+        const plGlobal = new THREE.PointLight(0xffffff, 0.8, 50, 0.2);
+        plGlobal.position.set(0, 20, 0);
+        sceneRef.current?.add(plGlobal);
+
     }, []);
 
 
