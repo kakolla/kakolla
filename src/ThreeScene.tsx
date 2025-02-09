@@ -15,7 +15,7 @@ import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } fr
 import { NoiseEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 
-import { DecalGeometry } from 'three/examples/jsm/Addons.js';
+// import { DecalGeometry } from 'three/examples/jsm/Addons.js';
 
 interface Props {
     pageState: string;
@@ -24,7 +24,6 @@ interface Props {
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
-import { start } from 'repl';
 
 
 function ThreeScene({ pageState }: Props) {
@@ -69,7 +68,7 @@ function ThreeScene({ pageState }: Props) {
     } = {
         home: 80,
         stuff: 0,
-        about: 8
+        about: 30
     };
 
     let pageStateCamPositions: {
@@ -79,7 +78,7 @@ function ThreeScene({ pageState }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
-        about: new THREE.Vector3(0, 0, 0)
+        about: new THREE.Vector3(-10, 10, -50)
 
     }
 
@@ -121,8 +120,8 @@ function ThreeScene({ pageState }: Props) {
         
 
         // Add grid helper
-        const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-        sceneRef.current?.add(gridHelper);
+        // const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
+        // sceneRef.current?.add(gridHelper);
 
         // console.log(projList);
 
@@ -175,7 +174,6 @@ function ThreeScene({ pageState }: Props) {
                     // loadedModel.position.set(-8, 0, 2);
                     // projModelRef.current = loadedModel;
 
-                    const decalPath = projList[projCount];
 
                     const geometry = new THREE.BoxGeometry(0.05, 1, 1.778);
                     const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
@@ -274,6 +272,8 @@ function ThreeScene({ pageState }: Props) {
             try {
                 [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
                 sceneRef.current?.add(particlesRef.current);
+                particlesRef.current.scale.set(0.5,0.5,0.5); // NOT OPTIMAL but wtv for now
+                particlesRef.current.position.set(-37, 6, 18.5);
             } catch (error) {
                 console.error("Error loading particle model with animation:", error);
             }
@@ -403,14 +403,16 @@ function ThreeScene({ pageState }: Props) {
             case "stuff":
                 controlsRef.current.autoRotate = false;
                 controlsRef.current.minDistance = 1.7;
-                targetPosition = ((pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]));
+                targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 // cameraRef.current!.position.set(-37, 10, 18.5);
                 // cameraRef.current!.lookAt(0, 0, 0);
                 break;
             case "about":
-                targetPosition.set(0, 50, 0);
+                controlsRef.current.autoRotate = true;
+                targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             default:
+                controlsRef.current.autoRotate = true;
                 targetPosition.set(0, 0, 0);
                 break;
 
