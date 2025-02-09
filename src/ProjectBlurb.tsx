@@ -19,12 +19,10 @@ function ProjectBlurb(props: Props) {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     // props.onVisible(props.header); // notify parent (Projects.tsx) that its visible
-                    console.log(props.header);
-                    console.log(props.headersList.indexOf(props.header));
                     props.onVisible(props.headersList.indexOf(props.header)); // notify parent (Projects.tsx) that its visible
                 }
             },
-            { threshold: 0.7 } // occurs when 70% of component is visible
+            { threshold: 0.3 } // occurs when 70% of component is visible
         );
         
         if (ref.current) observer.observe(ref.current);

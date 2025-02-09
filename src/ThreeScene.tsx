@@ -55,6 +55,7 @@ function ThreeScene({ pageState }: Props) {
 
     // refs for decal
     const decalPlaneRef = useRef<THREE.Mesh>();
+    const texturesListRef = useRef<THREE.Texture[]>([]);
 
 
     // for post processing
@@ -112,7 +113,7 @@ function ThreeScene({ pageState }: Props) {
         controlsRef.current.maxPolarAngle = Math.PI / 2; // prevent camera past ground level
         controlsRef.current.enableDamping = true;
         controlsRef.current.minDistance = 1.7;
-        controlsRef.current.target.set(100, -300, 0);
+        controlsRef.current.target.set(50, -50, 0);
         controlsRef.current.panSpeed = 0.8;
         controlsRef.current.maxDistance = 2000;
 
@@ -143,6 +144,23 @@ function ThreeScene({ pageState }: Props) {
 
 
     useEffect(() => {
+        // load textures
+        let decalTexture: THREE.Texture;
+        let decalPath: string;
+        for (let i = 0; i < projList.length; i++) {
+            decalPath = projList[i];
+            decalTexture = new THREE.TextureLoader().load(decalPath);
+            texturesListRef.current.push(decalTexture);
+        }
+        console.log("Finished loading project images.");
+
+        // cleanup
+        return () => {
+            texturesListRef.current.forEach(texture => texture.dispose());
+            texturesListRef.current = [];
+        }
+    }, []);
+    useEffect(() => {
         console.log("Loading display object");
         let isMounted = true;
         async function loadDisplay() {
@@ -163,7 +181,8 @@ function ThreeScene({ pageState }: Props) {
                     cube.rotation.y += 0.3;
                     sceneRef.current!.add(cube);
 
-                    const decalTexture = new THREE.TextureLoader().load(decalPath);
+                    // const decalTexture = new THREE.TextureLoader().load(decalPath);
+                    const decalTexture = texturesListRef.current[projCount];
 
                     // Create the material for the decal
                     const decalMaterial = new THREE.MeshStandardMaterial({
@@ -373,8 +392,9 @@ function ThreeScene({ pageState }: Props) {
         switch (pageState) {
             case "home":
                 // controlsRef.current.minDistance = 65;
-                cameraRef.current!.position.set(-20, 20, 65);
-                targetPosition.set(0, 0.5, 0);
+                // cameraRef.current!.position.set(-20, 20, 65);
+                // targetPosition.set(0, 0.5, 0);
+                targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "stuff":
                 // controlsRef.current.minDistance = 8;
@@ -419,7 +439,7 @@ function ThreeScene({ pageState }: Props) {
             // interpolate maxDistance smoothly if it's not the homepage
             // would error since homepage has no maxDistance defined
             if (newMaxDistance != -1) {
-                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.03;
+                controlsRef.current!.maxDistance += (newMaxDistance - controlsRef.current!.maxDistance) * 0.02;
             }
             controlsRef.current!.update();
 
@@ -455,32 +475,12 @@ function ThreeScene({ pageState }: Props) {
 
 
 
-    function nextProject() {
-        if (projCount === projList.length - 1) return;
-        setProjCount(projCount + 1);
-
-    }
-    function prevProject() {
-        if (projCount === 0) return;
-        setProjCount(projCount - 1);
-
-    }
-
 
     // component return statement
     return <div className="" ref={containerRef}>
-
         {
             pageState === "stuff" &&
             <>
-                <button className="animate-fade absolute text-white bottom-12 left-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] "
-                    onClick={nextProject}>
-                    Next
-                </button>
-                <button className="animate-fade absolute text-white bottom-12 right-2/3 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
-                    onClick={prevProject}>
-                    Prev
-                </button>
                 <Projects projCount={projCount} setProjCountFunction={setProjCount}/>
             </>
         }
