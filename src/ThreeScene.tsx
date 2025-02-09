@@ -77,7 +77,7 @@ function ThreeScene({ pageState }: Props) {
         about: THREE.Vector3,
     } = {
         home: new THREE.Vector3(0, 0, 0),
-        stuff: new THREE.Vector3(-37, 6, 17.8),
+        stuff: new THREE.Vector3(-37, 6, 18),
         about: new THREE.Vector3(0, 0, 0)
 
     }
@@ -434,7 +434,7 @@ function ThreeScene({ pageState }: Props) {
                 if (pageState === "stuff") {
                     // cameraRef.current!.lookAt(-37, 6, 18.5);
                     controlsRef.current!.target = (pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]);
-                    cameraRef.current!.position.set(-50, 10, 17.8);
+                    cameraRef.current!.position.set(-50, 8, 21);
                     controlsRef.current!.update();
                 }
             }

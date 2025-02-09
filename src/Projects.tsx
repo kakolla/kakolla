@@ -102,12 +102,13 @@ function Projects({ projCount, setProjCountFunction }: Props) {
                     />
                 ))}
 
-            <p className="fixed top-5 left-5 bg-black text-white p-2">
+            {/* Debugging */}
+            {/* <p className="fixed top-5 left-5 bg-black text-white p-2">
                 Currently Viewing: {visibleComponentIndex}
             </p>
             <p className="fixed top-20 left-5 bg-black text-white p-2">
                 projCount : {projCount}
-            </p>
+            </p> */}
 
         </div>
 
