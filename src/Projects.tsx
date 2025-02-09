@@ -7,7 +7,7 @@ interface Props {
     setProjCountFunction: any
 }
 
-function Projects({ projCount, setProjCountFunction }: Props) {
+function Projects({ setProjCountFunction }: Props) {
     let texts: string[] = [];
     let headers: string[] = [];
     let links: string[] = [];

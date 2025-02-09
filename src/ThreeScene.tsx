@@ -116,6 +116,9 @@ function ThreeScene({ pageState }: Props) {
         controlsRef.current.target.set(50, -50, 0);
         controlsRef.current.panSpeed = 0.8;
         controlsRef.current.maxDistance = 2000;
+        controlsRef.current.autoRotate = true;
+        controlsRef.current.autoRotateSpeed = 0.005;
+        
 
         // Add grid helper
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
@@ -391,13 +394,15 @@ function ThreeScene({ pageState }: Props) {
         // positions for the orbit camera
         switch (pageState) {
             case "home":
-                // controlsRef.current.minDistance = 65;
+                controlsRef.current.autoRotate = true;
+                controlsRef.current.minDistance = 65;
                 // cameraRef.current!.position.set(-20, 20, 65);
                 // targetPosition.set(0, 0.5, 0);
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "stuff":
-                // controlsRef.current.minDistance = 8;
+                controlsRef.current.autoRotate = false;
+                controlsRef.current.minDistance = 1.7;
                 targetPosition = ((pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]));
                 // cameraRef.current!.position.set(-37, 10, 18.5);
                 // cameraRef.current!.lookAt(0, 0, 0);
@@ -414,7 +419,7 @@ function ThreeScene({ pageState }: Props) {
         // console.log("Smoothly moving camera to ", pageState, targetPosition);
 
         const startTarget = controlsRef.current.target.clone();
-        console.log('target is!', startTarget)
+        // console.log('target is!', startTarget)
         const duration = 2000;
         const startTime = performance.now();
 
