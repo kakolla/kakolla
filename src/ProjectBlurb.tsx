@@ -22,7 +22,7 @@ function ProjectBlurb(props: Props) {
                     props.onVisible(props.headersList.indexOf(props.header)); // notify parent (Projects.tsx) that its visible
                 }
             },
-            { threshold: 0.3 } // occurs when 70% of component is visible
+            { threshold: 0.5 } // occurs when 50% of component is visible
         );
         
         if (ref.current) observer.observe(ref.current);
@@ -45,16 +45,13 @@ function ProjectBlurb(props: Props) {
 
         </>
         }
-        <h1 className="w-100 text-2xl w-2/3">
+        <a className="w-100 text-2xl w-2/3 text-lime-600" href={props.link!} target="_blank">
             {props.header}
-        </h1>
+        </a>
         <h2 className="w-100 pt-2 max-w-xl">
             {props.text}
         </h2>
         <br />
-        <a className="w-100 pt-2 max-w-xl" href={props.link!} target="_blank">
-            Link
-        </a>
 
 
     </div>

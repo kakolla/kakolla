@@ -14,9 +14,6 @@ function Home({ pageState }: Props) {
             <h1 className="pt-4 max-w-xl">
                 I'm currently performing research at the Center for Neural Engineering @ USC and exploring GraphRAG-based pipelines for better LLM contextual accuracy.
             </h1>
-            <h1 className="pt-4 max-w-xl">
-                Thank you for checking out my site!
-            </h1>
 
 
 
