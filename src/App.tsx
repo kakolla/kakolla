@@ -6,12 +6,14 @@ import NavBar from './NavBar.tsx'
 import Home from './Home.tsx';
 import About from './About.tsx';
 import Contacts from './Contacts.tsx';
+import { Analytics } from "@vercel/analytics/react"
 
 
 function App() {
     const [state, setState] = useState<string>("home");
 
     return <>
+        <Analytics /> 
         <Title text="Abi Kakolla" pageState={state} />
         <Home pageState={state} />
         <About pageState={state} />
