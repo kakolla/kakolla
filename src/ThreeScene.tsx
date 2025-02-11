@@ -116,7 +116,7 @@ function ThreeScene({ pageState }: Props) {
         controlsRef.current.panSpeed = 0.8;
         controlsRef.current.maxDistance = 2000;
         controlsRef.current.autoRotate = true;
-        controlsRef.current.autoRotateSpeed = 0.005;
+        controlsRef.current.autoRotateSpeed = 0.01;
         
 
         // Add grid helper
@@ -408,6 +408,7 @@ function ThreeScene({ pageState }: Props) {
                 // cameraRef.current!.lookAt(0, 0, 0);
                 break;
             case "about":
+                controlsRef.current.minDistance = 8;
                 controlsRef.current.autoRotate = true;
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
