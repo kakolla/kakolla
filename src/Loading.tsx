@@ -7,23 +7,25 @@ interface Props {
 
 
 
-function Loading({endLoadingScreen} : Props) {
+function Loading({ endLoadingScreen }: Props) {
 
     console.log("endloadingscreen is", endLoadingScreen);
 
-    return <div className="top-1/2 left-1/2 absolute rotating-item">
-            {
-                (!endLoadingScreen) ? (
-                    <img src="/planet.svg" width={40} ></img>
-                ) : (
-                    <></>
-                )
-            }
+    return <div>
+        {
+            (!endLoadingScreen) ? (
+                <div className="bg-black h-screen">
+                    <img className="top-1/2 left-1/2 absolute rotating-item" src="/planet.svg" width={40} ></img>
+                </div>
+            ) : (
+                <></>
+            )
+        }
 
 
 
     </div>
-    
+
 }
 
 export default Loading;
