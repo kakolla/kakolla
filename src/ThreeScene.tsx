@@ -20,13 +20,14 @@ import { AnimationMixer, Clock } from "three";
 interface Props {
     pageState: string;
     setPage: Function;
+    setEndLoadingScreen: Function;
 }
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
 
 
-function ThreeScene({ pageState }: Props) {
+function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
     const projects = ["models/display/poster0.png",
         "models/display/cleansweep.png",
@@ -242,6 +243,7 @@ function ThreeScene({ pageState }: Props) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
                     homeModelRef.current = loadedModel;
+                    setEndLoadingScreen(true); 
 
                 }
 

@@ -7,17 +7,20 @@ import Home from './Home.tsx';
 import About from './About.tsx';
 import Contacts from './Contacts.tsx';
 import { Analytics } from "@vercel/analytics/react"
+import Loading from './Loading.tsx';
 
 
 function App() {
     const [state, setState] = useState<string>("home");
+    const [endLoadingScreen, setEndLoadingScreen] = useState<boolean>(false);
 
     return <>
         <Analytics /> 
+        <Loading endLoadingScreen={endLoadingScreen}/>
         <Title text="Abi Kakolla" pageState={state} />
         <Home pageState={state} />
         <About pageState={state} />
-        <ThreeScene pageState={state} setPage={setState}/>
+        <ThreeScene pageState={state} setPage={setState} setEndLoadingScreen={setEndLoadingScreen}/>
         <NavBar pageState={state} onClickFunc={setState}/>
         <Contacts />
     </>
