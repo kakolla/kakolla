@@ -11,12 +11,12 @@ function Loading({endLoadingScreen} : Props) {
 
     console.log("endloadingscreen is", endLoadingScreen);
 
-    return <div className="highlighted-text top-1/2 left-1/2 animate-fade absolute text-white ">
+    return <div className="top-1/2 left-1/2 absolute">
             {
                 (!endLoadingScreen) ? (
-                    <h1>Loading</h1>
+                    <img src="/planet.svg" width={40} ></img>
                 ) : (
-                    <h1>done</h1>
+                    <></>
                 )
             }
 
