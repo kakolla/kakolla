@@ -11,12 +11,14 @@ function About({ pageState }: Props) {
     
     // `
     if (pageState === "about") {
-        return <div className="highlighted-text animate-fade absolute top-1/2 left-20 text-white overflow-y-auto no-scrollbar bottom-10 w-1/3">
+        return <div className="highlighted-text animate-fade absolute top-1/2 left-20 
+        text-white overflow-y-auto no-scrollbar bottom-10 w-1/3
+        max-md:w-3/4 max-md:bottom-10 max-md:h-60 max-md:top-2/3">
             <p className="pt-2 max-w-xl">
             ─── ･ about me ･ ───
             </p>
             <p className="pt-2 max-w-xl">
-                My love for computers and everything engineering started when I was 8 when I learned how to use windows shell scripting
+                My love for computers and all things engineering started when I was 8 when I learned how to use windows shell scripting
                 to create my first quiz game. Ever since then, I've loved using computers to build creative solutions for all sorts of problems.
             </p>
 
