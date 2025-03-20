@@ -135,7 +135,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         controlsRef.current.panSpeed = 0.8;
         controlsRef.current.maxDistance = 2000;
         controlsRef.current.autoRotate = true;
-        controlsRef.current.autoRotateSpeed = 0.01;
+        controlsRef.current.autoRotateSpeed = 0.02;
         
 
         // Add grid helper
