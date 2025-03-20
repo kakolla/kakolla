@@ -14,7 +14,7 @@ function Home({ pageState }: Props) {
                 machine learning, neuroscience, and developing creative solutions to real-world problems.
             </h1>
             <h1 className="pt-4 max-w-xl">
-                I'm currently performing research at the Center for Neural Engineering @ USC and exploring GraphRAG-based pipelines for better LLM contextual accuracy.
+                I'm currently performing research at the Center for Neural Engineering @ USC and exploring GraphRAG-based architectures for improving LLM reasoning.
             </h1>
 
 
