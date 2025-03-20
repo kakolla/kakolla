@@ -15,6 +15,9 @@ import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } fr
 import { NoiseEffect } from 'postprocessing';
 import { AnimationMixer, Clock } from "three";
 
+// Responsive design lib
+import { useMediaQuery } from "react-responsive";
+
 // import { DecalGeometry } from 'three/examples/jsm/Addons.js';
 
 interface Props {
@@ -28,6 +31,8 @@ import Projects from './Projects.tsx';
 
 
 function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
+    // Hook to check if on mobile
+    const isMobile: Boolean = useMediaQuery({ maxWidth: 767});
 
     const projects = ["models/display/poster0.png",
         "models/display/cleansweep.png",
@@ -72,6 +77,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         about: 30
     };
 
+    // camera positions for Desktop
     let pageStateCamPositions: {
         home: THREE.Vector3,
         stuff: THREE.Vector3,
@@ -80,6 +86,18 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
         about: new THREE.Vector3(-10, 10, -50)
+
+    }
+
+    // camera positions for Mobile
+    let pageStateCamPositionsMobile: {
+        home: THREE.Vector3,
+        stuff: THREE.Vector3,
+        about: THREE.Vector3,
+    } = {
+        home: new THREE.Vector3(0, 0, 0), // unchanged
+        stuff: new THREE.Vector3(-37, 6, 18.5),
+        about: new THREE.Vector3(-10, 10, -50) // unchanged
 
     }
 
@@ -404,8 +422,15 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 break;
             case "stuff":
                 controlsRef.current.autoRotate = false;
-                controlsRef.current.minDistance = 1.7;
-                targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
+                if (!isMobile) {
+                    controlsRef.current.minDistance = 1.7;
+                    targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
+                } else {
+                    console.log("Mobile");
+                    controlsRef.current.minDistance = 4;
+                    targetPosition = pageStateCamPositionsMobile[pageState as keyof typeof pageStateCamPositions];
+
+                }
                 // cameraRef.current!.position.set(-37, 10, 18.5);
                 // cameraRef.current!.lookAt(0, 0, 0);
                 break;
@@ -464,7 +489,11 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 // ending target position (where camera looks at)
                 if (pageState === "stuff") {
                     // cameraRef.current!.lookAt(-37, 6, 18.5);
-                    controlsRef.current!.target = (pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]);
+                    if (!isMobile) {
+                        controlsRef.current!.target = (pageStateCamPositions[pageState as keyof typeof pageStateCamPositions]);
+                    } else {
+                        controlsRef.current!.target = targetPosition = pageStateCamPositionsMobile[pageState as keyof typeof pageStateCamPositions];
+                    }
                     cameraRef.current!.position.set(-50, 8, 21);
                     controlsRef.current!.update();
                 }
