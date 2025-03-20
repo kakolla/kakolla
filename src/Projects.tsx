@@ -84,9 +84,9 @@ function Projects({ projCount, setProjCountFunction }: Props) {
     }, [visibleComponentIndex]);
 
     return (
-        <div className="highlighted-text w-1/3 animate-fade absolute 
-        h-60 left-20 text-white overflow-y-auto no-scrollbar bottom-10
-        max-md:w-3/4 max-md:bottom-20">
+        <div className="highlighted-text animate-fade absolute top-2/3 left-20  
+        text-white overflow-y-auto no-scrollbar bottom-10
+        max-md:w-3/4 max-md:bottom-10">
             {
                 headers.map((header, index) => (
                     <ProjectBlurb
