@@ -38,11 +38,11 @@ function Projects({ projCount, setProjCountFunction }: Props) {
         `);
     links.push("https://devpost.com/software/cleansweep-tjq36w");
 
-    headers.push("HybridRAG pipeline for neuroscience-based text citation");
+    headers.push("Graph Retrieval Augmented Generation Pipeline");
     texts.push(`
-        Developing a Hybrid Retrieval-Augmented Generation (RAG) pipeline for research faculty integrating Graph retrieval agents
-        with Neo4j and LangChain, and vector-based agents with Pinecone, to enable neuroscience-focused text and citation generation. Panel 
-        shown is a picture of the Graph database.
+        Built a GraphRAG multi-agent chain-of-thought pipeline leveraging knowledge graphs to
+        improve LLM reasoning across 100+ computational neuroscience documents. Used LangChain,
+        Neo4j, & NetworkX
 
         `);
     links.push("https://github.com/NESCOM-Lab/knowledgegraphs");
@@ -57,9 +57,25 @@ function Projects({ projCount, setProjCountFunction }: Props) {
         `);
     links.push("https://www.roblox.com/games/17043959296/Mystical-Memories-The-Genies-Challenge");
 
+    headers.push("2D Hippocampus Voxel Visualization @ CNE");
+    texts.push(`
+        Visualized in-silico slices of the Hippocampus. Wrote gridding & artefact removal algorithms in
+        Python, used by faculty.
+                
+        `);
+    links.push("https://github.com/NESCOM-Lab/2D-Hippocampus-Voxel-Coordinate-Visualization");
+
+    headers.push("Retinal Cells splitting @ CNE");
+    texts.push(`
+        Split multi-soma .SWC files into separate files for each soma, and convert 
+        them to model-compatible formats using Python
+                
+        `);
+    links.push("https://github.com/NESCOM-Lab/retinal-cells-model");
+
     headers.push("Scribo");
     texts.push(`
-        Developed a light-view email viewing client that classifies emails as important using a Gaussian Naive Bayes Classifier.
+        Developed a light-weight email viewing client that classifies emails as important using a Gaussian Naive Bayes Classifier.
         Feature-engineered using self-selected parameters and trained using 2 months worth of supervised email data.
                 
         `);

@@ -38,6 +38,8 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         "models/display/cleansweep.png",
         "models/display/curve.png",
         "models/display/roblox.png",
+        "models/display/slice.png",
+        "models/display/somas.png",
         "models/display/scribo.png"];
 
     const [projCount, setProjCount] = useState<number>(0);
