@@ -7,7 +7,7 @@ function Notes({ pageState }: Props) {
 
     return (
         <>
-            <div className="animate-fade absolute inset-0 z-2 backdrop-blur-sm bg-black/30">
+            <div className="animate-fade absolute inset-0 z-2 backdrop-blur-sm bg-black/70">
             </div>
             <div className="fixed top-20 left-1/2 h-[80vh] transform -translate-x-1/2
             max-w-3xl w-full p-8 rounded-lg overflow-y-auto animate-fade no-scrollbar">

@@ -90,7 +90,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
-        notes: new THREE.Vector3(-10, 10, -50),
+        notes: new THREE.Vector3(20, 10, -20),
         about: new THREE.Vector3(-10, 10, -50)
 
     }
