@@ -8,6 +8,7 @@ import About from './About.tsx';
 import Contacts from './Contacts.tsx';
 import { Analytics } from "@vercel/analytics/react"
 import Loading from './Loading.tsx';
+import Notes from './Notes.tsx';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Loading endLoadingScreen={endLoadingScreen}/>
         <Title text="Abi Kakolla" pageState={state} />
         <Home pageState={state} />
+        <Notes pageState={state} />
         <About pageState={state} />
         <ThreeScene pageState={state} setPage={setState} setEndLoadingScreen={setEndLoadingScreen}/>
         <NavBar pageState={state} onClickFunc={setState}/>

@@ -72,10 +72,12 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     let pageStateMaxDistances: {
         home: number,
         stuff: number,
+        notes: number,
         about: number
     } = {
         home: 80,
         stuff: 0,
+        notes: 30,
         about: 30
     };
 
@@ -83,10 +85,12 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     let pageStateCamPositions: {
         home: THREE.Vector3,
         stuff: THREE.Vector3,
+        notes: THREE.Vector3
         about: THREE.Vector3,
     } = {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
+        notes: new THREE.Vector3(-10, 10, -50),
         about: new THREE.Vector3(-10, 10, -50)
 
     }
@@ -95,10 +99,12 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     let pageStateCamPositionsMobile: {
         home: THREE.Vector3,
         stuff: THREE.Vector3,
+        notes: THREE.Vector3,
         about: THREE.Vector3,
     } = {
         home: new THREE.Vector3(0, 0, 0), // unchanged
         stuff: new THREE.Vector3(-37, 6, 18.5),
+        notes: new THREE.Vector3(-10, 10, -50), // unchanged
         about: new THREE.Vector3(-10, 10, -50) // unchanged
 
     }
@@ -435,6 +441,11 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 }
                 // cameraRef.current!.position.set(-37, 10, 18.5);
                 // cameraRef.current!.lookAt(0, 0, 0);
+                break;
+            case "notes":
+                controlsRef.current.minDistance = 8;
+                controlsRef.current.autoRotate = true;
+                targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "about":
                 controlsRef.current.minDistance = 8;
