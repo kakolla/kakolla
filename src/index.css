@@ -48,6 +48,8 @@ canvas {
   border-radius: 0.3rem;
   padding: 1rem;
   overflow-x: auto;
+  border-radius: 1rem;
+  box-shadow: 1px 1px 5px 0px black;
 }
 
 /* spacing if an element follows another element */
@@ -71,6 +73,11 @@ canvas {
   margin-top: 1rem;
 }
 
+.katex-wrapper h6 {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
@@ -90,6 +97,11 @@ canvas {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone; /* Safari */
   line-height: 1.6; 
+}
+
+img {
+  border-radius: 1rem;
+  box-shadow: 1px 1px 5px 0px black;
 }
 
 
