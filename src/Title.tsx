@@ -1,9 +1,6 @@
-// import { useState } from 'react';
-
 
 interface Props {
-    text: string,
-    pageState: string
+    text: string
 }
 
 function Title(props: Props) {
