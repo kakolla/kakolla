@@ -38,8 +38,8 @@ function Notes({ pageState }: Props) {
 
     // Posts list 
     const postsList = [
-        "post1.md",
-        "post2.md"
+        "coming-soon.md",
+        "preface.md"
     ]
 
     // Hooks to manage post
@@ -87,7 +87,7 @@ function Notes({ pageState }: Props) {
 
                     {/*  title */}
                     <h1 className="text-xl font-semibold text-center mb-6">
-                        a place for my notes and experiments
+                        here's where i try to explore new things
                     </h1>
 
 
