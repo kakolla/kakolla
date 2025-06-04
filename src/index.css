@@ -27,6 +27,50 @@ canvas {
   display: block;
 }
 
+/* remove all tailwind styles for katex wrapper */
+.katex-wrapper .katex,
+.katex-wrapper .katex * {
+  all: revert !important;
+}
+
+.katex-wrapper .katex-html {
+  display: none !important; /* hide fallback layer */
+}
+
+/* override tailwind styling for \text in katex */
+.katex-wrapper .katex-mathml math mtext {
+  display: flex !important;
+}
+
+
+/* style highlight.js code blocks */
+.katex-wrapper pre.hljs {
+  border-radius: 0.3rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* spacing if an element follows another element */
+.katex-wrapper * + * {
+  margin-top: 1.25rem;
+}
+
+
+.katex-wrapper h1 {
+  font-size: 2rem;
+  margin-top: 1.5rem;
+}
+
+.katex-wrapper h2 {
+  font-size: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.katex-wrapper h3 {
+  font-size: 1.25rem;
+  margin-top: 1rem;
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
