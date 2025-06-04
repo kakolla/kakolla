@@ -45,7 +45,7 @@ function ProjectBlurb(props: Props) {
 
         </>
         }
-        <a className="w-100 text-2xl w-2/3 text-lime-600" href={props.link!} target="_blank">
+        <a className="w-100 text-2xl w-2/3 text-[#D2A8FF]" href={props.link!} target="_blank">
             {props.header}
         </a>
         <h2 className="w-100 pt-2 max-w-xl">
