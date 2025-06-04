@@ -59,16 +59,16 @@ function Projects({ projCount, setProjCountFunction }: Props) {
 
     headers.push("2D Hippocampus Voxel Visualization @ CNE");
     texts.push(`
-        Visualized in-silico slices of the Hippocampus. Wrote gridding & artefact removal algorithms in
-        Python, used by faculty.
+        Visualized in-silico slices of the Hippocampus. Wrote gridding & artefact removal algorithms using
+        Python and NumPy, used by faculty. UI built with Streamlit and Matplotlib
                 
         `);
     links.push("https://github.com/NESCOM-Lab/2D-Hippocampus-Voxel-Coordinate-Visualization");
 
     headers.push("Retinal Cells splitting @ CNE");
     texts.push(`
-        Split multi-soma .SWC files into separate files for each soma, and convert 
-        them to model-compatible formats using Python
+        Split multi-soma .SWC files into separate files for each soma, and converted 
+        them to model-compatible formats using Python.
                 
         `);
     links.push("https://github.com/NESCOM-Lab/retinal-cells-model");
