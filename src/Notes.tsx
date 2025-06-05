@@ -99,7 +99,7 @@ function Notes({ pageState }: Props) {
                             <li key={idx}>
                                 {/* format link nicely */}
                                 <Link to={`/${file.replace('.md', '')}`} className="underline text-blue-300 hover:text-blue-200">
-                                    {file.replace('.md', '').replaceAll('-', ' ')}
+                                    {file.replace('.md', '').replace(/-/g, ' ')}
                                 </Link>
                             </li>
                         ))}
