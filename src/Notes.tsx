@@ -14,7 +14,7 @@ import { useLocation } from 'react-router-dom'
 // Markdownit config 
 // Hightlight.js for code snippets
 // Markitdown for katex (latex)
-const md = new MarkdownIt({
+const md: any = new MarkdownIt({
     html: true,
     highlight: (str, lang) => {
         if (lang && hljs.getLanguage(lang)) {
