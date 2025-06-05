@@ -90,7 +90,7 @@ canvas {
   }
 }
 .highlighted-text {
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.8);
   border-radius: 8px;
   padding: 4px 6px;
   display: inline;
