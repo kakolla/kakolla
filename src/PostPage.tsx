@@ -52,10 +52,12 @@ function PostPage() {
             <div className="animate-fade">
                 {/* container */}
                 <div className="fixed top-20 left-1/2 h-[80vh] transform -translate-x-1/2
-        max-w-3xl w-full p-8 rounded-lg overflow-y-auto text-white no-scrollbar">
+    w-3/4 pr-20 p-8 rounded-lg overflow-y-auto text-white no-scrollbar
+    md:w-1/2 md:pr-8">
+
 
                     {/* back button */}
-                    <button style={{color: "#D2A8FF"}} onClick={() => navigate('/', { state: { cameFromPost: true } })}>back</button>
+                    <button style={{ color: "#D2A8FF" }} onClick={() => navigate('/', { state: { cameFromPost: true } })}>back</button>
 
                     {/* title */}
                     <h1 className="text-xl font-semibold text-center mb-6">{postTitle}.md</h1>
