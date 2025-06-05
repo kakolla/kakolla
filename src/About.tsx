@@ -18,14 +18,16 @@ function About({ pageState }: Props) {
             ─── ･ about me ･ ───
             </p>
             <p className="pt-2 max-w-xl">
-                My love for computers and all things engineering started when I was 8 when I learned how to use windows shell scripting
-                to create my first quiz game. Ever since then, I've loved using computers to build creative solutions for all sorts of problems.
+                My interest for computing and all things engineering started when I was 8 when I learned how to use VBScript
+                to create my first gui-based quiz game. Ever since then, I've loved using computers to build 
+                creative solutions for all kinds of problems.
             </p>
 
             <br />
             <p className="pt-2 max-w-xl">
                 Currently, I'm excited about the intersection of neuroscience, machine learning, and computer science. I've spent
-                the last few years performing research at the Center for Neural Engineering @ USC, working on startups, participating in hackathons, and much more!
+                the last few years performing research at the Center for Neural Engineering @ USC, working for startups, participating in hackathons, and 
+                trying to get as low level as I can with computer science.
             </p>
 
             <br />
