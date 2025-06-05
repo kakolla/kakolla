@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Hightlight.js for code snippets
 // Markitdown for katex (latex)
-const md = new MarkdownIt({
+const md: any = new MarkdownIt({
     html: true,
     highlight: (str, lang) => {
         if (lang && hljs.getLanguage(lang)) {

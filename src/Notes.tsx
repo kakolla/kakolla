@@ -43,9 +43,9 @@ function Notes({ pageState }: Props) {
     ]
 
     // Hooks to manage post
-    const [selectedPost, setSelectedPost] = useState<string | null>(null)
-    const [postHtml, setPostHtml] = useState<string>('')
-    const [postTitle, setPostTitle] = useState<string>('')
+    const [selectedPost] = useState<string | null>(null)
+    const [, setPostHtml] = useState<string>('')
+    const [, setPostTitle] = useState<string>('')
 
     // for determining if we came from a post, so we don't reanimate blur bg
     const location = useLocation(); 
