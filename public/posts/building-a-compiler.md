@@ -47,7 +47,7 @@ _main:                                  ; @main
 
 The only important stuff is the "mov w0, #3" part. This is saying to load the value 3 into `w0`, which is the return value of the main function. And then we return from the function with 'ret'.
 
-What we can first try to do is make our compiler take an integer as an input, and output this really straight-forward Assembly code for the CPU.
+What we can first try to do is make our compiler (which is basically a code generator for now) take an integer as an input, and output this really straight-forward Assembly code for the CPU.
 ```cpp
 // imports
 std::string c_entry(int x) {
