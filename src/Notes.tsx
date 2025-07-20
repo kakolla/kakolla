@@ -38,7 +38,7 @@ function Notes({ pageState }: Props) {
 
     // Posts list 
     const postsList = [
-        "coming-soon.md",
+        "building-a-compiler.md",
         "preface.md"
     ]
 
