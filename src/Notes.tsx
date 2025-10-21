@@ -39,7 +39,6 @@ function Notes({ pageState }: Props) {
     // Posts list 
     const postsList = [
         "building-a-compiler.md",
-        "preface.md"
     ]
 
     // Hooks to manage post
