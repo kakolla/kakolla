@@ -34,13 +34,14 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // Hook to check if on mobile
     const isMobile: Boolean = useMediaQuery({ maxWidth: 767});
 
-    const projects = ["models/display/poster0.png",
+    const projects = [
         "models/display/cleansweep.png",
-        "models/display/curve.png",
+        "models/display/riot.png",
+        "models/display/raycast.png",
+        "models/display/quantum.png",
         "models/display/roblox.png",
-        "models/display/slice.png",
-        "models/display/somas.png",
-        "models/display/scribo.png"];
+        "models/display/poster0.png",
+        "models/display/curve.png",];
 
     const [projCount, setProjCount] = useState<number>(0);
     const [projList] = useState<string[]>(projects); // first poster
@@ -337,6 +338,51 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         plGlobal.position.set(0, 20, 0);
         sceneRef.current?.add(plGlobal);
 
+    }, []);
+
+    // add stars to the sky
+    useEffect(() => {
+        const starGeometry = new THREE.BufferGeometry();
+        const starCount = isMobile ? 2000 : 5000;
+        const starPositions = new Float32Array(starCount * 3);
+        const starSizes = new Float32Array(starCount);
+
+        for (let i = 0; i < starCount; i++) {
+            // random positions
+            const radius = 500 + Math.random() * 1000; // Stars between 500 and 1500 units away
+            const theta = Math.random() * Math.PI * 2; // Random angle around Y axis
+            const phi = Math.random() * Math.PI; // Random angle from Y axis
+
+            starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+            starPositions[i * 3 + 1] = radius * Math.cos(phi);
+            starPositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+            // rand star sizes
+            starSizes[i] = Math.random() * 3 + 1;
+        }
+
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+
+        // star materials
+        const starMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 2,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+        });
+
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        sceneRef.current?.add(stars);
+
+        // Cleanup
+        return () => {
+            sceneRef.current?.remove(stars);
+            starGeometry.dispose();
+            starMaterial.dispose();
+        };
     }, []);
 
 

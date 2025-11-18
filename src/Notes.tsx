@@ -81,7 +81,8 @@ function Notes({ pageState }: Props) {
 
                 {/* container */}
                 <div className="fixed top-20 left-1/2 h-[80vh] transform -translate-x-1/2
-        max-w-3xl w-full p-8 rounded-lg overflow-y-auto animate-fade no-scrollbar text-white">
+        max-w-3xl w-full p-8 rounded-lg overflow-y-auto animate-fade no-scrollbar text-white
+        max-md:pr-48">
 
 
                     {/*  title */}
