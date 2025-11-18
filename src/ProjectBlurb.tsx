@@ -22,7 +22,7 @@ function ProjectBlurb(props: Props) {
                     props.onVisible(props.headersList.indexOf(props.header)); // notify parent (Projects.tsx) that its visible
                 }
             },
-            { threshold: 0.2 } // move when 20% of component visible
+            { threshold: 0.25 } // move when 25% of component visible
         );
 
         if (ref.current) observer.observe(ref.current);
