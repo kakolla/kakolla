@@ -11,13 +11,13 @@ function Home({ pageState }: Props) {
         max-md:w-3/4 max-md:bottom-10">
             <h1 className="text-2xl">Hi there, I'm <p className="inline text-[#D2A8FF]">Abi 👽</p></h1>
             <h1 className="pt-4 max-w-xl">I'm a Computer Science student at USC enthusiastic about
-                machine learning, neuroscience, and developing creative solutions to real-world problems.
+                machine learning, neuroscience, and distributed systems.
             </h1>
             <h1 className="pt-4 max-w-xl">
-                I'm currently designing and evaluating enterprise FinOps models at 
+                I'm currently working on ML infrastructure and FinOps-focused data engineering systems at 
                 <p className="inline text-sky-600"> 
-                <a href="https://stitcher.ai/" target="_blank"> StitcherAI</a></p> and 
-                performing research on improving LLM reasoning at the <p className="inline text-sky-600">
+                <a href="https://stitcher.ai/" target="_blank"> StitcherAI</a></p>, and 
+                researching graph-based LLM reasoning at the <p className="inline text-sky-600">
                 <a href="https://itemsusc.org/" target="_blank">
                 Center for Neural 
                 Engineering @ USC
