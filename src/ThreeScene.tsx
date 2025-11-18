@@ -342,7 +342,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // add stars to the sky
     useEffect(() => {
         const starGeometry = new THREE.BufferGeometry();
-        const starCount = 5000;
+        const starCount = isMobile ? 2000 : 5000;
         const starPositions = new Float32Array(starCount * 3);
         const starSizes = new Float32Array(starCount);
 
