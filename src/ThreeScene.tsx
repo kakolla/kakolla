@@ -34,13 +34,14 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // Hook to check if on mobile
     const isMobile: Boolean = useMediaQuery({ maxWidth: 767});
 
-    const projects = ["models/display/poster0.png",
+    const projects = [
         "models/display/cleansweep.png",
-        "models/display/curve.png",
+        "models/display/riot.png",
+        "models/display/raycast.png",
+        "models/display/quantum.png",
         "models/display/roblox.png",
-        "models/display/slice.png",
-        "models/display/somas.png",
-        "models/display/scribo.png"];
+        "models/display/poster0.png",
+        "models/display/curve.png",];
 
     const [projCount, setProjCount] = useState<number>(0);
     const [projList] = useState<string[]>(projects); // first poster
