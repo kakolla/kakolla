@@ -103,9 +103,10 @@ function Projects({ projCount, setProjCountFunction }: Props) {
     //     text-white overflow-y-auto no-scrollbar bottom-10
     //     max-md:w-3/4 max-md:bottom-10
     return (
-        <div className="highlighted-text w-1/3 animate-fade absolute 
-        h-60 left-20 text-white overflow-y-auto no-scrollbar bottom-10
-        max-md:w-3/4 max-md:bottom-10 max-md:bottom-10 max-md:h-48">
+        <div className="highlighted-text w-1/3 animate-fade absolute
+        h-60 left-20 text-white overflow-y-scroll no-scrollbar bottom-10
+        max-md:w-3/4 max-md:bottom-10 max-md:bottom-10 max-md:h-48
+        snap-y snap-mandatory scroll-smooth">
             {
                 headers.map((header, index) => (
                     <ProjectBlurb

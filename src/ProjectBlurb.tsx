@@ -22,9 +22,9 @@ function ProjectBlurb(props: Props) {
                     props.onVisible(props.headersList.indexOf(props.header)); // notify parent (Projects.tsx) that its visible
                 }
             },
-            { threshold: 0.3 } // occurs when 50% of component is visible
+            { threshold: 0.6 } // occurs when 60% of component is visible
         );
-        
+
         if (ref.current) observer.observe(ref.current);
 
         // cleanup
@@ -36,24 +36,13 @@ function ProjectBlurb(props: Props) {
 
 
 
-    return <div ref={ref}>
-        {props.addSpace && <>
-            <br />
-            <br />
-            <br />
-            <br />
-
-        </>
-        }
+    return <div ref={ref} className="h-full snap-start flex flex-col justify-center">
         <a className="w-100 text-2xl w-2/3 text-[#D2A8FF]" href={props.link!} target="_blank">
             {props.header}
         </a>
         <h2 className="w-100 pt-2 max-w-xl">
             {props.text}
         </h2>
-        <br />
-
-
     </div>
 
 
