@@ -28,7 +28,7 @@ interface Props {
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
-import { loadTraffic, NUM_CARS } from './TrafficGfx.tsx';
+import { loadTrafficLane, animateTrafficLane, NUM_CARS_PER_LANE, type TrafficLaneRefs } from './TrafficGfx.tsx';
 
 
 function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
@@ -66,10 +66,30 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     const decalPlaneRef = useRef<THREE.Mesh>();
     const texturesListRef = useRef<THREE.Texture[]>([]);
 
-    // refs for traffic car
-    const carInstancedMeshRef = useRef<THREE.InstancedMesh | null>(null);
-    const trafficCurveRef = useRef<THREE.Curve<THREE.Vector3> | null>(null);
-    const carProgressOffsetsRef = useRef<number[]>([]); // progress for car path  
+    // refs for traffic curves
+    const eastForwardLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
+
+    const eastOncomingLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };  
+
+    const westForwardLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
+
+    const westOncomingLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
 
     // for post processing
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
@@ -153,8 +173,8 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         
 
         // Add grid helper
-        const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-        sceneRef.current?.add(gridHelper);
+        // const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
+        // sceneRef.current?.add(gridHelper);
 
         // console.log(projList);
 
@@ -312,7 +332,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 console.error("Error loading particle model with animation:", error);
             }
         }
-        loadModel();
+        // loadModel();
 
         // cleanup
         return () => {
@@ -323,23 +343,92 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         };
     }, []); // only run once on mount
 
-    // load traffic car and path
+    // load traffic lanes
     useEffect(() => {
         let isMounted = true;
 
-        loadTraffic(isMounted, sceneRef, carInstancedMeshRef, trafficCurveRef, carProgressOffsetsRef);
+        // oad east forward lane 
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/East.glb',
+            new THREE.Vector3(0, 0, 0),
+            false, // not reversed
+            eastForwardLane,
+            sceneRef,
+            isMounted,
+            0x00ff00 // green debug color
+        );
+
+        // east oncoming lane (reversed)
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/East.glb',
+            new THREE.Vector3(0, 0, 0.25), // offset on Z
+            true, // reversed
+            eastOncomingLane,
+            sceneRef,
+            isMounted,
+            0xff0000 // red debug color
+        );
+
+        // west lane
+         loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/West.glb',
+            new THREE.Vector3(0, 0, 0),
+            false, // not reversed
+            westForwardLane,
+            sceneRef,
+            isMounted,
+            0x00ff00 
+        );
+
+        // west oncoming lane
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/West.glb',
+            new THREE.Vector3(0, 0, 0.25), // offset on Z
+            true, // reversed
+            westOncomingLane,
+            sceneRef,
+            isMounted,
+            0xff0000 
+        );
 
         return () => {
             // cleanup
             isMounted = false;
-            if (carInstancedMeshRef.current) {
-                sceneRef.current?.remove(carInstancedMeshRef.current);
-                carInstancedMeshRef.current.geometry.dispose();
-                if (carInstancedMeshRef.current.material instanceof THREE.Material) {
-                    carInstancedMeshRef.current.material.dispose();
+
+            // clean up forward lane
+            if (eastForwardLane.instancedMesh.current) {
+                sceneRef.current?.remove(eastForwardLane.instancedMesh.current);
+                eastForwardLane.instancedMesh.current.geometry.dispose();
+                if (eastForwardLane.instancedMesh.current.material instanceof THREE.Material) {
+                    eastForwardLane.instancedMesh.current.material.dispose();
                 }
             }
-            carProgressOffsetsRef.current = [];
+
+            // clean up oncoming lane
+            if (eastOncomingLane.instancedMesh.current) {
+                sceneRef.current?.remove(eastOncomingLane.instancedMesh.current);
+                eastOncomingLane.instancedMesh.current.geometry.dispose();
+                if (eastOncomingLane.instancedMesh.current.material instanceof THREE.Material) {
+                    eastOncomingLane.instancedMesh.current.material.dispose();
+                }
+            }
+
+             if (westForwardLane.instancedMesh.current) {
+                sceneRef.current?.remove(westForwardLane.instancedMesh.current);
+                westForwardLane.instancedMesh.current.geometry.dispose();
+                if (westForwardLane.instancedMesh.current.material instanceof THREE.Material) {
+                    westForwardLane.instancedMesh.current.material.dispose();
+                }
+            }
+
+            // clean up oncoming lane
+            if (westOncomingLane.instancedMesh.current) {
+                sceneRef.current?.remove(westOncomingLane.instancedMesh.current);
+                westOncomingLane.instancedMesh.current.geometry.dispose();
+                if (westOncomingLane.instancedMesh.current.material instanceof THREE.Material) {
+                    westOncomingLane.instancedMesh.current.material.dispose();
+                }
+            }
         };
     }, []);
 
@@ -454,44 +543,11 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 animMixerRef.current.timeScale = 0.1;
             }
 
-            // using InstancedMesh
-            if (carInstancedMeshRef.current &&
-                carInstancedMeshRef.current.instanceMatrix &&
-                trafficCurveRef.current &&
-                carProgressOffsetsRef.current.length === NUM_CARS) {
-
-                const matrix = new THREE.Matrix4();
-                const position = new THREE.Vector3();
-                const quaternion = new THREE.Quaternion();
-                const scale = new THREE.Vector3(1, 1, 1);
-
-                for (let i = 0; i < NUM_CARS; i++) {
-                    // ith car update 
-                    carProgressOffsetsRef.current[i] += 0.00002; // speed of car
-                    if (carProgressOffsetsRef.current[i] > 1) {
-                        carProgressOffsetsRef.current[i] = 0; // loop back
-                    }
-
-                    // get position on curve
-                    position.copy(trafficCurveRef.current.getPoint(carProgressOffsetsRef.current[i]));
-                    // orientation from tangent
-                    const tangent = trafficCurveRef.current.getTangent(carProgressOffsetsRef.current[i]);
-                    const lookAtTarget = new THREE.Vector3().copy(position).add(tangent);
-
-                    // create rotation matrix using lookAt
-                    const tempMatrix = new THREE.Matrix4();
-                    tempMatrix.lookAt(position, lookAtTarget, new THREE.Vector3(0, 1, 0));
-                    quaternion.setFromRotationMatrix(tempMatrix);
-
-                    // Compose the transformation matrix
-                    matrix.compose(position, quaternion, scale); 
-                    // set the matrix for this instance
-                    carInstancedMeshRef.current.setMatrixAt(i, matrix);
-                }
-
-                // flag to gpu to update
-                carInstancedMeshRef.current.instanceMatrix.needsUpdate = true;
-            }
+            // animate all traffic lanes
+            animateTrafficLane(eastForwardLane, 0.00003, NUM_CARS_PER_LANE); //ref, speed, num cars
+            animateTrafficLane(eastOncomingLane, 0.00003, NUM_CARS_PER_LANE);
+            animateTrafficLane(westForwardLane, 0.00003, NUM_CARS_PER_LANE);
+            animateTrafficLane(westOncomingLane, 0.00003, NUM_CARS_PER_LANE);
 
             TWEEN.update();
         }
