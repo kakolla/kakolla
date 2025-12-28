@@ -65,8 +65,12 @@ export async function loadObject(path: string, scene: THREE.Scene, decalPath?: s
                     return;
                 }
 
+                // load texture properly (will need to be disposed later)
+                const textureLoader = new THREE.TextureLoader();
+                const decalTexture = textureLoader.load(decalPath);
+
                 const decalMaterial = new THREE.MeshStandardMaterial({
-                    map: new THREE.TextureLoader().load(decalPath),
+                    map: decalTexture,
                     transparent: true,
                 });
 

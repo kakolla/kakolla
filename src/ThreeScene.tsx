@@ -9,6 +9,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // Object loading functions from other file
 import { loadObject } from '../src/ThreeFunctions.tsx';
 import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
+import { createSnowEffect, type SnowSystem } from '../src/SnowEffect.tsx';
 
 // post processing
 import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
@@ -65,6 +66,9 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // refs for decal
     const decalPlaneRef = useRef<THREE.Mesh>();
     const texturesListRef = useRef<THREE.Texture[]>([]);
+
+    // ref for snow system
+    const snowSystemRef = useRef<SnowSystem | null>(null);
 
     // refs for traffic curves
     const eastForwardLane: TrafficLaneRefs = {
@@ -274,10 +278,21 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             if (projModelRef.current) {
                 console.log("Removing display object");
                 sceneRef.current?.remove(projModelRef.current);
-
             }
-            sceneRef.current?.remove(decalPlaneRef.current!)
 
+            // dispose decal plane properly
+            if (decalPlaneRef.current) {
+                if (decalPlaneRef.current.geometry) {
+                    decalPlaneRef.current.geometry.dispose();
+                }
+                if (decalPlaneRef.current.material instanceof THREE.MeshStandardMaterial) {
+                    if (decalPlaneRef.current.material.map) {
+                        decalPlaneRef.current.material.map.dispose();
+                    }
+                    decalPlaneRef.current.material.dispose();
+                }
+                sceneRef.current?.remove(decalPlaneRef.current);
+            }
         }
 
 
@@ -309,6 +324,33 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             isMounted = false;
             if (homeModelRef.current) {
                 console.log("removing home");
+
+                // traverse through to dispose of all geometries, materials, and textures
+                homeModelRef.current.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        if (child.geometry) {
+                            child.geometry.dispose();
+                        }
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(mat => {
+                                    if (mat.map) mat.map.dispose();
+                                    if (mat.normalMap) mat.normalMap.dispose();
+                                    if (mat.roughnessMap) mat.roughnessMap.dispose();
+                                    if (mat.metalnessMap) mat.metalnessMap.dispose();
+                                    mat.dispose();
+                                });
+                            } else {
+                                if (child.material.map) child.material.map.dispose();
+                                if (child.material.normalMap) child.material.normalMap.dispose();
+                                if (child.material.roughnessMap) child.material.roughnessMap.dispose();
+                                if (child.material.metalnessMap) child.material.metalnessMap.dispose();
+                                child.material.dispose();
+                            }
+                        }
+                    }
+                });
+
                 sceneRef.current?.remove(homeModelRef.current);
             }
 
@@ -336,8 +378,33 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
         // cleanup
         return () => {
+            // stop animation mixer
+            if (animMixerRef.current) {
+                animMixerRef.current.stopAllAction();
+                animMixerRef.current.uncacheRoot(particlesRef.current!);
+            }
+
             if (particlesRef.current) {
                 console.log("Removing particles object");
+
+                // dispose
+                particlesRef.current.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(mat => {
+                                    if (mat.map) mat.map.dispose();
+                                    mat.dispose();
+                                });
+                            } else {
+                                if (child.material.map) child.material.map.dispose();
+                                child.material.dispose();
+                            }
+                        }
+                    }
+                });
+
                 sceneRef.current?.remove(particlesRef.current);
             }
         };
@@ -499,11 +566,26 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         };
     }, []);
 
+    // add snow effect
+    useEffect(() => {
+        // create snow system
+        const snowSystem = createSnowEffect(Boolean(isMobile));
+        snowSystemRef.current = snowSystem;
+        sceneRef.current?.add(snowSystem.particles);
+
+        // cleanup
+        return () => {
+            if (snowSystemRef.current) {
+                sceneRef.current?.remove(snowSystemRef.current.particles);
+                snowSystemRef.current.dispose(); // clear from gpu memory
+                snowSystemRef.current = null;
+            }
+        };
+    }, [isMobile]);
+
 
     // add post processing effects
     useEffect(() => {
-
-
         // post processing effects
         composer = new EffectComposer(rendererRef.current);
         composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
@@ -513,8 +595,13 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             premultiply: true,
         });
 
-        noiseEffect.blendMode.opacity.value = 0.90; // control strength of effect    
+        noiseEffect.blendMode.opacity.value = 0.90; // control strength of effect
         composer.addPass(new EffectPass(cameraRef.current, noiseEffect));
+
+        return () => {
+            // Dispose composer and all its passes
+            composer.dispose();
+        };
     }, []);
 
 
@@ -544,10 +631,15 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             }
 
             // animate all traffic lanes
-            animateTrafficLane(eastForwardLane, 0.00003, NUM_CARS_PER_LANE); //ref, speed, num cars
+            animateTrafficLane(eastForwardLane, 0.00006, NUM_CARS_PER_LANE); //ref, speed, num cars
             animateTrafficLane(eastOncomingLane, 0.00003, NUM_CARS_PER_LANE);
             animateTrafficLane(westForwardLane, 0.00003, NUM_CARS_PER_LANE);
             animateTrafficLane(westOncomingLane, 0.00003, NUM_CARS_PER_LANE);
+
+            // update snow particles animation
+            if (snowSystemRef.current) {
+                snowSystemRef.current.update(deltaTime);
+            }
 
             TWEEN.update();
         }
