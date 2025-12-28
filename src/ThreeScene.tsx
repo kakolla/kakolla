@@ -363,52 +363,52 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
 
     // load animated particles using promise (and only once)
-    useEffect(() => {
-        async function loadModel() {
-            try {
-                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
-                sceneRef.current?.add(particlesRef.current);
-                particlesRef.current.scale.set(0.5,0.5,0.5); // NOT OPTIMAL but wtv for now
-                particlesRef.current.position.set(-37, 6, 18.5);
-            } catch (error) {
-                console.error("Error loading particle model with animation:", error);
-            }
-        }
-        // loadModel();
+    // useEffect(() => {
+    //     async function loadModel() {
+    //         try {
+    //             [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
+    //             sceneRef.current?.add(particlesRef.current);
+    //             particlesRef.current.scale.set(0.5,0.5,0.5); // NOT OPTIMAL but wtv for now
+    //             particlesRef.current.position.set(-37, 6, 18.5);
+    //         } catch (error) {
+    //             console.error("Error loading particle model with animation:", error);
+    //         }
+    //     }
+    //     // loadModel();
 
-        // cleanup
-        return () => {
-            // stop animation mixer
-            if (animMixerRef.current) {
-                animMixerRef.current.stopAllAction();
-                animMixerRef.current.uncacheRoot(particlesRef.current!);
-            }
+    //     // cleanup
+    //     return () => {
+    //         // stop animation mixer
+    //         if (animMixerRef.current) {
+    //             animMixerRef.current.stopAllAction();
+    //             animMixerRef.current.uncacheRoot(particlesRef.current!);
+    //         }
 
-            if (particlesRef.current) {
-                console.log("Removing particles object");
+    //         if (particlesRef.current) {
+    //             console.log("Removing particles object");
 
-                // dispose
-                particlesRef.current.traverse((child) => {
-                    if (child instanceof THREE.Mesh) {
-                        if (child.geometry) child.geometry.dispose();
-                        if (child.material) {
-                            if (Array.isArray(child.material)) {
-                                child.material.forEach(mat => {
-                                    if (mat.map) mat.map.dispose();
-                                    mat.dispose();
-                                });
-                            } else {
-                                if (child.material.map) child.material.map.dispose();
-                                child.material.dispose();
-                            }
-                        }
-                    }
-                });
+    //             // dispose
+    //             particlesRef.current.traverse((child) => {
+    //                 if (child instanceof THREE.Mesh) {
+    //                     if (child.geometry) child.geometry.dispose();
+    //                     if (child.material) {
+    //                         if (Array.isArray(child.material)) {
+    //                             child.material.forEach(mat => {
+    //                                 if (mat.map) mat.map.dispose();
+    //                                 mat.dispose();
+    //                             });
+    //                         } else {
+    //                             if (child.material.map) child.material.map.dispose();
+    //                             child.material.dispose();
+    //                         }
+    //                     }
+    //                 }
+    //             });
 
-                sceneRef.current?.remove(particlesRef.current);
-            }
-        };
-    }, []); // only run once on mount
+    //             sceneRef.current?.remove(particlesRef.current);
+    //         }
+    //     };
+    // }, []); // only run once on mount
 
     // load traffic lanes
     useEffect(() => {
