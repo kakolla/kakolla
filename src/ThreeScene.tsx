@@ -587,7 +587,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         switch (pageState) {
             case "home":
                 controlsRef.current.autoRotate = true;
-                controlsRef.current.minDistance = 0;
+                controlsRef.current.minDistance = 65;
                 // cameraRef.current!.position.set(-20, 20, 65);
                 // targetPosition.set(0, 0.5, 0);
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
