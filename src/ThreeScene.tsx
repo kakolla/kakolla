@@ -9,7 +9,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // Object loading functions from other file
 import { loadObject } from '../src/ThreeFunctions.tsx';
 import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
-import { createSnowEffect, type SnowSystem } from '../src/SnowEffect.tsx';
+import { createSnowEffect, type SnowSystem } from './SnowGfx.tsx';
 
 // post processing
 import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
