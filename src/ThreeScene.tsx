@@ -28,6 +28,7 @@ interface Props {
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
+import { loadTraffic, NUM_CARS } from './TrafficGfx.tsx';
 
 
 function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
@@ -65,6 +66,10 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     const decalPlaneRef = useRef<THREE.Mesh>();
     const texturesListRef = useRef<THREE.Texture[]>([]);
 
+    // refs for traffic car
+    const carInstancedMeshRef = useRef<THREE.InstancedMesh | null>(null);
+    const trafficCurveRef = useRef<THREE.Curve<THREE.Vector3> | null>(null);
+    const carProgressOffsetsRef = useRef<number[]>([]); // progress for car path  
 
     // for post processing
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
@@ -148,8 +153,8 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         
 
         // Add grid helper
-        // const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
-        // sceneRef.current?.add(gridHelper);
+        const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
+        sceneRef.current?.add(gridHelper);
 
         // console.log(projList);
 
@@ -318,6 +323,26 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         };
     }, []); // only run once on mount
 
+    // load traffic car and path
+    useEffect(() => {
+        let isMounted = true;
+
+        loadTraffic(isMounted, sceneRef, carInstancedMeshRef, trafficCurveRef, carProgressOffsetsRef);
+
+        return () => {
+            // cleanup
+            isMounted = false;
+            if (carInstancedMeshRef.current) {
+                sceneRef.current?.remove(carInstancedMeshRef.current);
+                carInstancedMeshRef.current.geometry.dispose();
+                if (carInstancedMeshRef.current.material instanceof THREE.Material) {
+                    carInstancedMeshRef.current.material.dispose();
+                }
+            }
+            carProgressOffsetsRef.current = [];
+        };
+    }, []);
+
 
     // add lighting
     useEffect(() => {
@@ -393,7 +418,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         // post processing effects
         composer = new EffectComposer(rendererRef.current);
         composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
-        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 1, luminanceThreshold: .7, radius: 0.5 })));
+        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 1, luminanceThreshold: .5, radius: 0.5 })));
         const noiseEffect = new NoiseEffect({
             blendFunction: BlendFunction.SCREEN,
             premultiply: true,
@@ -429,10 +454,47 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 animMixerRef.current.timeScale = 0.1;
             }
 
+            // using InstancedMesh
+            if (carInstancedMeshRef.current &&
+                carInstancedMeshRef.current.instanceMatrix &&
+                trafficCurveRef.current &&
+                carProgressOffsetsRef.current.length === NUM_CARS) {
+
+                const matrix = new THREE.Matrix4();
+                const position = new THREE.Vector3();
+                const quaternion = new THREE.Quaternion();
+                const scale = new THREE.Vector3(1, 1, 1);
+
+                for (let i = 0; i < NUM_CARS; i++) {
+                    // ith car update 
+                    carProgressOffsetsRef.current[i] += 0.00002; // speed of car
+                    if (carProgressOffsetsRef.current[i] > 1) {
+                        carProgressOffsetsRef.current[i] = 0; // loop back
+                    }
+
+                    // get position on curve
+                    position.copy(trafficCurveRef.current.getPoint(carProgressOffsetsRef.current[i]));
+                    // orientation from tangent
+                    const tangent = trafficCurveRef.current.getTangent(carProgressOffsetsRef.current[i]);
+                    const lookAtTarget = new THREE.Vector3().copy(position).add(tangent);
+
+                    // create rotation matrix using lookAt
+                    const tempMatrix = new THREE.Matrix4();
+                    tempMatrix.lookAt(position, lookAtTarget, new THREE.Vector3(0, 1, 0));
+                    quaternion.setFromRotationMatrix(tempMatrix);
+
+                    // Compose the transformation matrix
+                    matrix.compose(position, quaternion, scale); 
+                    // set the matrix for this instance
+                    carInstancedMeshRef.current.setMatrixAt(i, matrix);
+                }
+
+                // flag to gpu to update
+                carInstancedMeshRef.current.instanceMatrix.needsUpdate = true;
+            }
+
             TWEEN.update();
         }
-        requestAnimationFrame(animate);
-
 
         // double check if webGL is compatible (from three js docs)
         if (WebGL.isWebGL2Available()) {
@@ -469,7 +531,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         switch (pageState) {
             case "home":
                 controlsRef.current.autoRotate = true;
-                controlsRef.current.minDistance = 65;
+                controlsRef.current.minDistance = 0;
                 // cameraRef.current!.position.set(-20, 20, 65);
                 // targetPosition.set(0, 0.5, 0);
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
