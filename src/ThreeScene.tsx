@@ -120,7 +120,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
-        notes: new THREE.Vector3(20, 10, -20),
+        notes: new THREE.Vector3(30, 10, 0),
         about: new THREE.Vector3(-10, 10, -50)
 
     }
@@ -134,7 +134,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0), // unchanged
         stuff: new THREE.Vector3(-37, 6, 18.5),
-        notes: new THREE.Vector3(-10, 10, -50), // unchanged
+        notes: new THREE.Vector3(20, 10, 0), // unchanged
         about: new THREE.Vector3(-10, 10, -50) // unchanged
 
     }
@@ -675,9 +675,15 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     useEffect(() => {
         if (!controlsRef.current) return;
         let targetPosition = new THREE.Vector3();
+        const resetPolarAngles = () => {
+            controlsRef.current!.maxPolarAngle = Math.PI / 2;
+            controlsRef.current!.minPolarAngle = 0;
+        };
+
         // positions for the orbit camera
         switch (pageState) {
             case "home":
+                resetPolarAngles();
                 controlsRef.current.autoRotate = true;
                 controlsRef.current.minDistance = 65;
                 // cameraRef.current!.position.set(-20, 20, 65);
@@ -685,6 +691,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "stuff":
+                resetPolarAngles();
                 controlsRef.current.autoRotate = false;
                 if (!isMobile) {
                     controlsRef.current.minDistance = 1.7;
@@ -699,16 +706,21 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 // cameraRef.current!.lookAt(0, 0, 0);
                 break;
             case "notes":
-                controlsRef.current.minDistance = 8;
                 controlsRef.current.autoRotate = true;
+                controlsRef.current.minDistance = 20;
+                controlsRef.current.maxPolarAngle = 0; // top down view
+                controlsRef.current.minPolarAngle = 0; 
+                cameraRef.current!.position.set(0, 50, 0); // position above
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "about":
+                resetPolarAngles();
                 controlsRef.current.minDistance = 8;
                 controlsRef.current.autoRotate = true;
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             default:
+                resetPolarAngles();
                 controlsRef.current.autoRotate = true;
                 targetPosition.set(0, 0, 0);
                 break;
