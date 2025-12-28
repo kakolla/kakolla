@@ -376,7 +376,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             // random positions
             const radius = 500 + Math.random() * 1000; // Stars between 500 and 1500 units away
             const theta = Math.random() * Math.PI * 2; // Random angle around Y axis
-            const phi = Math.random() * Math.PI; // Random angle from Y axis
+            const phi = Math.random() * Math.PI / 2; 
 
             starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
             starPositions[i * 3 + 1] = radius * Math.cos(phi);
