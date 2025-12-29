@@ -9,15 +9,20 @@ import About from './About.tsx'
 import Contacts from './Contacts.tsx'
 import { Analytics } from '@vercel/analytics/react'
 import Loading from './Loading.tsx'
-import Notes from './Notes.tsx'
+// import Notes from './Notes.tsx'
+import {lazy, Suspense} from 'react'
 import PostPage from './PostPage.tsx'
+
+const Notes = lazy(() => import('./Notes.tsx'))
 
 function MainPages({ pageState }: { pageState: string }) {
     return (
         // Main navigable pages
         <div>
             <Home pageState={pageState} />
-            <Notes pageState={pageState} />
+            <Suspense fallback={null}>
+                <Notes pageState={pageState} />
+            </Suspense>
             <About pageState={pageState} />
             <Contacts />
         </div>
