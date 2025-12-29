@@ -8,7 +8,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // Object loading functions from other file
 import { loadObject } from '../src/ThreeFunctions.tsx';
-import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
+// import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
+import { createSnowEffect, type SnowSystem } from './SnowGfx.tsx';
 
 // post processing
 import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
@@ -28,6 +29,7 @@ interface Props {
 
 import * as TWEEN from "three/addons/libs/tween.module.js";
 import Projects from './Projects.tsx';
+import { loadTrafficLane, animateTrafficLane, NUM_CARS_PER_LANE, type TrafficLaneRefs } from './TrafficGfx.tsx';
 
 
 function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
@@ -59,12 +61,39 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // variables for the particle object
     const clockRef = useRef<Clock>(new Clock()); // for animations
     const animMixerRef = useRef<AnimationMixer>(); // for now, for particle animation
-    const particlesRef = useRef<THREE.Object3D>();
+    // const particlesRef = useRef<THREE.Object3D>();
 
     // refs for decal
     const decalPlaneRef = useRef<THREE.Mesh>();
     const texturesListRef = useRef<THREE.Texture[]>([]);
 
+    // ref for snow system
+    const snowSystemRef = useRef<SnowSystem | null>(null);
+
+    // refs for traffic curves
+    const eastForwardLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
+
+    const eastOncomingLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };  
+
+    const westForwardLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
+
+    const westOncomingLane: TrafficLaneRefs = {
+        instancedMesh: useRef<THREE.InstancedMesh | null>(null),
+        curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
+        progressOffsets: useRef<number[]>([])
+    };
 
     // for post processing
     let composer = useRef<EffectComposer>(new EffectComposer(rendererRef.current)).current;
@@ -91,7 +120,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0),
         stuff: new THREE.Vector3(-37, 6, 18),
-        notes: new THREE.Vector3(20, 10, -20),
+        notes: new THREE.Vector3(30, 10, 0),
         about: new THREE.Vector3(-10, 10, -50)
 
     }
@@ -105,7 +134,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     } = {
         home: new THREE.Vector3(0, 0, 0), // unchanged
         stuff: new THREE.Vector3(-37, 6, 18.5),
-        notes: new THREE.Vector3(-10, 10, -50), // unchanged
+        notes: new THREE.Vector3(20, 10, 0), // unchanged
         about: new THREE.Vector3(-10, 10, -50) // unchanged
 
     }
@@ -249,10 +278,21 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             if (projModelRef.current) {
                 console.log("Removing display object");
                 sceneRef.current?.remove(projModelRef.current);
-
             }
-            sceneRef.current?.remove(decalPlaneRef.current!)
 
+            // dispose decal plane properly
+            if (decalPlaneRef.current) {
+                if (decalPlaneRef.current.geometry) {
+                    decalPlaneRef.current.geometry.dispose();
+                }
+                if (decalPlaneRef.current.material instanceof THREE.MeshStandardMaterial) {
+                    if (decalPlaneRef.current.material.map) {
+                        decalPlaneRef.current.material.map.dispose();
+                    }
+                    decalPlaneRef.current.material.dispose();
+                }
+                sceneRef.current?.remove(decalPlaneRef.current);
+            }
         }
 
 
@@ -284,6 +324,33 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             isMounted = false;
             if (homeModelRef.current) {
                 console.log("removing home");
+
+                // traverse through to dispose of all geometries, materials, and textures
+                homeModelRef.current.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        if (child.geometry) {
+                            child.geometry.dispose();
+                        }
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(mat => {
+                                    if (mat.map) mat.map.dispose();
+                                    if (mat.normalMap) mat.normalMap.dispose();
+                                    if (mat.roughnessMap) mat.roughnessMap.dispose();
+                                    if (mat.metalnessMap) mat.metalnessMap.dispose();
+                                    mat.dispose();
+                                });
+                            } else {
+                                if (child.material.map) child.material.map.dispose();
+                                if (child.material.normalMap) child.material.normalMap.dispose();
+                                if (child.material.roughnessMap) child.material.roughnessMap.dispose();
+                                if (child.material.metalnessMap) child.material.metalnessMap.dispose();
+                                child.material.dispose();
+                            }
+                        }
+                    }
+                });
+
                 sceneRef.current?.remove(homeModelRef.current);
             }
 
@@ -296,27 +363,141 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
 
     // load animated particles using promise (and only once)
-    useEffect(() => {
-        async function loadModel() {
-            try {
-                [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
-                sceneRef.current?.add(particlesRef.current);
-                particlesRef.current.scale.set(0.5,0.5,0.5); // NOT OPTIMAL but wtv for now
-                particlesRef.current.position.set(-37, 6, 18.5);
-            } catch (error) {
-                console.error("Error loading particle model with animation:", error);
-            }
-        }
-        loadModel();
+    // useEffect(() => {
+    //     async function loadModel() {
+    //         try {
+    //             [particlesRef.current, animMixerRef.current] = await loadObjectWithAnimation('models/particles/scene.gltf', sceneRef.current!);
+    //             sceneRef.current?.add(particlesRef.current);
+    //             particlesRef.current.scale.set(0.5,0.5,0.5); // NOT OPTIMAL but wtv for now
+    //             particlesRef.current.position.set(-37, 6, 18.5);
+    //         } catch (error) {
+    //             console.error("Error loading particle model with animation:", error);
+    //         }
+    //     }
+    //     // loadModel();
 
-        // cleanup
+    //     // cleanup
+    //     return () => {
+    //         // stop animation mixer
+    //         if (animMixerRef.current) {
+    //             animMixerRef.current.stopAllAction();
+    //             animMixerRef.current.uncacheRoot(particlesRef.current!);
+    //         }
+
+    //         if (particlesRef.current) {
+    //             console.log("Removing particles object");
+
+    //             // dispose
+    //             particlesRef.current.traverse((child) => {
+    //                 if (child instanceof THREE.Mesh) {
+    //                     if (child.geometry) child.geometry.dispose();
+    //                     if (child.material) {
+    //                         if (Array.isArray(child.material)) {
+    //                             child.material.forEach(mat => {
+    //                                 if (mat.map) mat.map.dispose();
+    //                                 mat.dispose();
+    //                             });
+    //                         } else {
+    //                             if (child.material.map) child.material.map.dispose();
+    //                             child.material.dispose();
+    //                         }
+    //                     }
+    //                 }
+    //             });
+
+    //             sceneRef.current?.remove(particlesRef.current);
+    //         }
+    //     };
+    // }, []); // only run once on mount
+
+    // load traffic lanes
+    useEffect(() => {
+        let isMounted = true;
+
+        // oad east forward lane 
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/East.glb',
+            new THREE.Vector3(0, 0, 0),
+            false, // not reversed
+            eastForwardLane,
+            sceneRef,
+            isMounted,
+            0x00ff00 // green debug color
+        );
+
+        // east oncoming lane (reversed)
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/East.glb',
+            new THREE.Vector3(0, 0, 0.25), // offset on Z
+            true, // reversed
+            eastOncomingLane,
+            sceneRef,
+            isMounted,
+            0xff0000 // red debug color
+        );
+
+        // west lane
+         loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/West.glb',
+            new THREE.Vector3(0, 0, 0),
+            false, // not reversed
+            westForwardLane,
+            sceneRef,
+            isMounted,
+            0x00ff00 
+        );
+
+        // west oncoming lane
+        loadTrafficLane(
+            'models/Trafficgfx/TrafficCurves/West.glb',
+            new THREE.Vector3(0, 0, 0.25), // offset on Z
+            true, // reversed
+            westOncomingLane,
+            sceneRef,
+            isMounted,
+            0xff0000 
+        );
+
         return () => {
-            if (particlesRef.current) {
-                console.log("Removing particles object");
-                sceneRef.current?.remove(particlesRef.current);
+            // cleanup
+            isMounted = false;
+
+            // clean up forward lane
+            if (eastForwardLane.instancedMesh.current) {
+                sceneRef.current?.remove(eastForwardLane.instancedMesh.current);
+                eastForwardLane.instancedMesh.current.geometry.dispose();
+                if (eastForwardLane.instancedMesh.current.material instanceof THREE.Material) {
+                    eastForwardLane.instancedMesh.current.material.dispose();
+                }
+            }
+
+            // clean up oncoming lane
+            if (eastOncomingLane.instancedMesh.current) {
+                sceneRef.current?.remove(eastOncomingLane.instancedMesh.current);
+                eastOncomingLane.instancedMesh.current.geometry.dispose();
+                if (eastOncomingLane.instancedMesh.current.material instanceof THREE.Material) {
+                    eastOncomingLane.instancedMesh.current.material.dispose();
+                }
+            }
+
+             if (westForwardLane.instancedMesh.current) {
+                sceneRef.current?.remove(westForwardLane.instancedMesh.current);
+                westForwardLane.instancedMesh.current.geometry.dispose();
+                if (westForwardLane.instancedMesh.current.material instanceof THREE.Material) {
+                    westForwardLane.instancedMesh.current.material.dispose();
+                }
+            }
+
+            // clean up oncoming lane
+            if (westOncomingLane.instancedMesh.current) {
+                sceneRef.current?.remove(westOncomingLane.instancedMesh.current);
+                westOncomingLane.instancedMesh.current.geometry.dispose();
+                if (westOncomingLane.instancedMesh.current.material instanceof THREE.Material) {
+                    westOncomingLane.instancedMesh.current.material.dispose();
+                }
             }
         };
-    }, []); // only run once on mount
+    }, []);
 
 
     // add lighting
@@ -351,7 +532,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             // random positions
             const radius = 500 + Math.random() * 1000; // Stars between 500 and 1500 units away
             const theta = Math.random() * Math.PI * 2; // Random angle around Y axis
-            const phi = Math.random() * Math.PI; // Random angle from Y axis
+            const phi = Math.random() * Math.PI / 2; 
 
             starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
             starPositions[i * 3 + 1] = radius * Math.cos(phi);
@@ -385,22 +566,42 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         };
     }, []);
 
+    // add snow effect
+    useEffect(() => {
+        // create snow system
+        const snowSystem = createSnowEffect(Boolean(isMobile));
+        snowSystemRef.current = snowSystem;
+        sceneRef.current?.add(snowSystem.particles);
+
+        // cleanup
+        return () => {
+            if (snowSystemRef.current) {
+                sceneRef.current?.remove(snowSystemRef.current.particles);
+                snowSystemRef.current.dispose(); // clear from gpu memory
+                snowSystemRef.current = null;
+            }
+        };
+    }, [isMobile]);
+
 
     // add post processing effects
     useEffect(() => {
-
-
         // post processing effects
         composer = new EffectComposer(rendererRef.current);
         composer.addPass(new RenderPass(sceneRef.current, cameraRef.current));
-        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 1, luminanceThreshold: .7, radius: 0.5 })));
+        composer.addPass(new EffectPass(cameraRef.current, new BloomEffect({ intensity: 1, luminanceThreshold: .5, radius: 0.5 })));
         const noiseEffect = new NoiseEffect({
             blendFunction: BlendFunction.SCREEN,
             premultiply: true,
         });
 
-        noiseEffect.blendMode.opacity.value = 0.90; // control strength of effect    
+        noiseEffect.blendMode.opacity.value = 0.90; // control strength of effect
         composer.addPass(new EffectPass(cameraRef.current, noiseEffect));
+
+        return () => {
+            // Dispose composer and all its passes
+            composer.dispose();
+        };
     }, []);
 
 
@@ -429,10 +630,19 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 animMixerRef.current.timeScale = 0.1;
             }
 
+            // animate all traffic lanes
+            animateTrafficLane(eastForwardLane, 0.00006, NUM_CARS_PER_LANE); //ref, speed, num cars
+            animateTrafficLane(eastOncomingLane, 0.00003, NUM_CARS_PER_LANE);
+            animateTrafficLane(westForwardLane, 0.00003, NUM_CARS_PER_LANE);
+            animateTrafficLane(westOncomingLane, 0.00003, NUM_CARS_PER_LANE);
+
+            // update snow particles animation
+            if (snowSystemRef.current) {
+                snowSystemRef.current.update(deltaTime);
+            }
+
             TWEEN.update();
         }
-        requestAnimationFrame(animate);
-
 
         // double check if webGL is compatible (from three js docs)
         if (WebGL.isWebGL2Available()) {
@@ -465,9 +675,15 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     useEffect(() => {
         if (!controlsRef.current) return;
         let targetPosition = new THREE.Vector3();
+        const resetPolarAngles = () => {
+            controlsRef.current!.maxPolarAngle = Math.PI / 2;
+            controlsRef.current!.minPolarAngle = 0;
+        };
+
         // positions for the orbit camera
         switch (pageState) {
             case "home":
+                resetPolarAngles();
                 controlsRef.current.autoRotate = true;
                 controlsRef.current.minDistance = 65;
                 // cameraRef.current!.position.set(-20, 20, 65);
@@ -475,6 +691,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "stuff":
+                resetPolarAngles();
                 controlsRef.current.autoRotate = false;
                 if (!isMobile) {
                     controlsRef.current.minDistance = 1.7;
@@ -489,16 +706,21 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 // cameraRef.current!.lookAt(0, 0, 0);
                 break;
             case "notes":
-                controlsRef.current.minDistance = 8;
                 controlsRef.current.autoRotate = true;
+                controlsRef.current.minDistance = 20;
+                controlsRef.current.maxPolarAngle = 0; // top down view
+                controlsRef.current.minPolarAngle = 0; 
+                cameraRef.current!.position.set(0, 50, 0); // position above
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             case "about":
+                resetPolarAngles();
                 controlsRef.current.minDistance = 8;
                 controlsRef.current.autoRotate = true;
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
             default:
+                resetPolarAngles();
                 controlsRef.current.autoRotate = true;
                 targetPosition.set(0, 0, 0);
                 break;

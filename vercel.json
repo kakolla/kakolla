@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!assets|models|posts|planet.svg).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
