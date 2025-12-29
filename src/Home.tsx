@@ -10,7 +10,7 @@ function Home({ pageState }: Props) {
         text-white overflow-y-auto no-scrollbar bottom-10
         max-md:w-3/4 max-md:bottom-10">
             <h1 className="text-2xl">Hi there, I'm <p className="inline text-[#D2A8FF]">Abi</p></h1>
-            <h1 className="pt-4 max-w-xl">I'm a Computer Science student at USC enthusiastic about
+            <h1 className="pt-4 max-w-xl">I'm a Computer Science student from Toronto studying at USC enthusiastic about
                 machine learning, neuroscience, and distributed systems.
             </h1>
             <h1 className="pt-4 max-w-xl">
