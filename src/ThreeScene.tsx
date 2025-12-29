@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // Object loading functions from other file
 import { loadObject } from '../src/ThreeFunctions.tsx';
-import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
+// import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
 import { createSnowEffect, type SnowSystem } from './SnowGfx.tsx';
 
 // post processing
@@ -61,7 +61,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // variables for the particle object
     const clockRef = useRef<Clock>(new Clock()); // for animations
     const animMixerRef = useRef<AnimationMixer>(); // for now, for particle animation
-    const particlesRef = useRef<THREE.Object3D>();
+    // const particlesRef = useRef<THREE.Object3D>();
 
     // refs for decal
     const decalPlaneRef = useRef<THREE.Mesh>();
