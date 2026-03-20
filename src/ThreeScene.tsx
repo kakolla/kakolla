@@ -9,7 +9,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // Object loading functions from other file
 import { loadObject } from '../src/ThreeFunctions.tsx';
 // import { loadObjectWithAnimation } from '../src/ThreeFunctions.tsx';
-import { createSnowEffect, type SnowSystem } from './SnowGfx.tsx';
+// import { createSnowEffect, type SnowSystem } from './SnowGfx.tsx';
 
 // post processing
 import { BlendFunction, BloomEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
@@ -68,7 +68,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     const texturesListRef = useRef<THREE.Texture[]>([]);
 
     // ref for snow system
-    const snowSystemRef = useRef<SnowSystem | null>(null);
+    // const snowSystemRef = useRef<SnowSystem | null>(null);
 
     // refs for traffic curves
     const eastForwardLane: TrafficLaneRefs = {
@@ -637,9 +637,9 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             animateTrafficLane(westOncomingLane, 0.00003, NUM_CARS_PER_LANE);
 
             // update snow particles animation
-            if (snowSystemRef.current) {
-                snowSystemRef.current.update(deltaTime);
-            }
+            // if (snowSystemRef.current) {
+            //     snowSystemRef.current.update(deltaTime);
+            // }
 
             TWEEN.update();
         }
