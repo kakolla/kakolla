@@ -34,7 +34,7 @@ import { loadTrafficLane, animateTrafficLane, NUM_CARS_PER_LANE, type TrafficLan
 
 function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     // Hook to check if on mobile
-    const isMobile: Boolean = useMediaQuery({ maxWidth: 767});
+    const isMobile: Boolean = useMediaQuery({ maxWidth: 767 });
 
     const projects = [
         "models/display/cleansweep.png",
@@ -81,7 +81,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         instancedMesh: useRef<THREE.InstancedMesh | null>(null),
         curve: useRef<THREE.Curve<THREE.Vector3> | null>(null),
         progressOffsets: useRef<number[]>([])
-    };  
+    };
 
     const westForwardLane: TrafficLaneRefs = {
         instancedMesh: useRef<THREE.InstancedMesh | null>(null),
@@ -174,7 +174,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         controlsRef.current.maxDistance = 2000;
         controlsRef.current.autoRotate = true;
         controlsRef.current.autoRotateSpeed = 0.02;
-        
+
 
         // Add grid helper
         // const gridHelper: THREE.GridHelper = new THREE.GridHelper(3000, 1000);
@@ -249,16 +249,16 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                     });
 
                     // define the plane size 
-                    const planeGeometry = new THREE.PlaneGeometry(1.778,1);  // Adjust size as needed
+                    const planeGeometry = new THREE.PlaneGeometry(1.778, 1);  // Adjust size as needed
 
                     // define plane ref
                     decalPlaneRef.current = new THREE.Mesh(planeGeometry, decalMaterial);
 
                     // set position
-                    decalPlaneRef.current.position.set(cube.position.x-0.03, cube.position.y, cube.position.z+0.02);
+                    decalPlaneRef.current.position.set(cube.position.x - 0.03, cube.position.y, cube.position.z + 0.02);
 
                     // rptate plane
-                    decalPlaneRef.current.rotation.set(0, 0.3+3*(Math.PI)/2, 0); // Adjust rotation as needed
+                    decalPlaneRef.current.rotation.set(0, 0.3 + 3 * (Math.PI) / 2, 0); // Adjust rotation as needed
 
                     // add to scene
                     sceneRef.current!.add(decalPlaneRef.current);
@@ -310,7 +310,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                     sceneRef.current?.add(loadedModel);
                     setHomeModel(loadedModel);
                     homeModelRef.current = loadedModel;
-                    setEndLoadingScreen(true); 
+                    setEndLoadingScreen(true);
 
                 }
 
@@ -437,14 +437,14 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         );
 
         // west lane
-         loadTrafficLane(
+        loadTrafficLane(
             'models/Trafficgfx/TrafficCurves/West.glb',
             new THREE.Vector3(0, 0, 0),
             false, // not reversed
             westForwardLane,
             sceneRef,
             isMounted,
-            0x00ff00 
+            0x00ff00
         );
 
         // west oncoming lane
@@ -455,7 +455,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             westOncomingLane,
             sceneRef,
             isMounted,
-            0xff0000 
+            0xff0000
         );
 
         return () => {
@@ -480,7 +480,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 }
             }
 
-             if (westForwardLane.instancedMesh.current) {
+            if (westForwardLane.instancedMesh.current) {
                 sceneRef.current?.remove(westForwardLane.instancedMesh.current);
                 westForwardLane.instancedMesh.current.geometry.dispose();
                 if (westForwardLane.instancedMesh.current.material instanceof THREE.Material) {
@@ -532,7 +532,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             // random positions
             const radius = 500 + Math.random() * 1000; // Stars between 500 and 1500 units away
             const theta = Math.random() * Math.PI * 2; // Random angle around Y axis
-            const phi = Math.random() * Math.PI / 2; 
+            const phi = Math.random() * Math.PI / 2;
 
             starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
             starPositions[i * 3 + 1] = radius * Math.cos(phi);
@@ -567,23 +567,23 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
     }, []);
 
     // add snow effect
-    useEffect(() => {
-        // create snow system
-        const snowSystem = createSnowEffect(Boolean(isMobile));
-        snowSystemRef.current = snowSystem;
-        sceneRef.current?.add(snowSystem.particles);
-
-        // cleanup
-        return () => {
-            if (snowSystemRef.current) {
-                sceneRef.current?.remove(snowSystemRef.current.particles);
-                snowSystemRef.current.dispose(); // clear from gpu memory
-                snowSystemRef.current = null;
-            }
-        };
-    }, [isMobile]);
-
-
+    // useEffect(() => {
+    //     // create snow system
+    //     const snowSystem = createSnowEffect(Boolean(isMobile));
+    //     snowSystemRef.current = snowSystem;
+    //     sceneRef.current?.add(snowSystem.particles);
+    //
+    //     // cleanup
+    //     return () => {
+    //         if (snowSystemRef.current) {
+    //             sceneRef.current?.remove(snowSystemRef.current.particles);
+    //             snowSystemRef.current.dispose(); // clear from gpu memory
+    //             snowSystemRef.current = null;
+    //         }
+    //     };
+    // }, [isMobile]);
+    //
+    //
     // add post processing effects
     useEffect(() => {
         // post processing effects
@@ -709,7 +709,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 controlsRef.current.autoRotate = true;
                 controlsRef.current.minDistance = 20;
                 controlsRef.current.maxPolarAngle = 0; // top down view
-                controlsRef.current.minPolarAngle = 0; 
+                controlsRef.current.minPolarAngle = 0;
                 cameraRef.current!.position.set(0, 50, 0); // position above
                 targetPosition = pageStateCamPositions[pageState as keyof typeof pageStateCamPositions];
                 break;
@@ -801,7 +801,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
         {
             pageState === "stuff" &&
             <>
-                <Projects projCount={projCount} setProjCountFunction={setProjCount}/>
+                <Projects projCount={projCount} setProjCountFunction={setProjCount} />
             </>
         }
     </div>;
