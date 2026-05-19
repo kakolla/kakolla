@@ -38,6 +38,7 @@ function Notes({ pageState }: Props) {
 
     // Posts list 
     const postsList = [
+        "lexer.md",
         "building-a-compiler.md",
     ]
 
@@ -47,7 +48,7 @@ function Notes({ pageState }: Props) {
     const [, setPostTitle] = useState<string>('')
 
     // for determining if we came from a post, so we don't reanimate blur bg
-    const location = useLocation(); 
+    const location = useLocation();
     const cameFromPost = location.state?.cameFromPost === true
 
 
