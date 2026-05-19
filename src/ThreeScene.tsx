@@ -631,10 +631,10 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
             }
 
             // animate all traffic lanes
-            animateTrafficLane(eastForwardLane, 0.00006, NUM_CARS_PER_LANE); //ref, speed, num cars
-            animateTrafficLane(eastOncomingLane, 0.00003, NUM_CARS_PER_LANE);
-            animateTrafficLane(westForwardLane, 0.00003, NUM_CARS_PER_LANE);
-            animateTrafficLane(westOncomingLane, 0.00003, NUM_CARS_PER_LANE);
+            animateTrafficLane(eastForwardLane, 0.00012, NUM_CARS_PER_LANE); //ref, speed, num cars
+            animateTrafficLane(eastOncomingLane, 0.00006, NUM_CARS_PER_LANE);
+            animateTrafficLane(westForwardLane, 0.00006, NUM_CARS_PER_LANE);
+            animateTrafficLane(westOncomingLane, 0.00012, NUM_CARS_PER_LANE);
 
             // update snow particles animation
             // if (snowSystemRef.current) {
