@@ -1,5 +1,6 @@
 #### building a compiler pt 1
 August 2025
+
 Here are some notes I've made on learning how to build a compiler following this paper: http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf.
 
 CPUs are designed to run instructions in machine code.

@@ -1,4 +1,4 @@
-May 9 2026
+May 7 2026
 
 recap:
 - lexer, parser, code generator = compiler
@@ -70,4 +70,3 @@ vector<Token> lex(const std::string& program) {
     return tokens;
 }
 ```
-
