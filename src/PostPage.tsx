@@ -26,6 +26,39 @@ const md: any = new MarkdownIt({
 })
 
 
+// get body of post filtering with regex
+function getDescription(body: string): string {
+    const text = body
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/[`#>*_~$-]/g, ' ')
+        .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/\s+/g, ' ')
+        .trim()
+    return text.length > 155 ? text.slice(0, 152) + '…' : text
+}
+
+// set html meta tag
+function setMeta(name: string, content: string) {
+    let el = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)
+    if (!el) {
+        el = document.createElement('meta')
+        el.setAttribute('name', name)
+        document.head.appendChild(el)
+    }
+    el.setAttribute('content', content)
+}
+
+
+function setCanonical(url: string) {
+    let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    if (!el) {
+        el = document.createElement('link')
+        el.setAttribute('rel', 'canonical')
+        document.head.appendChild(el)
+    }
+    el.setAttribute('href', url)
+}
+
 function PostPage() {
     const navigate = useNavigate()
     const { slug } = useParams() // react router that gets page slug
@@ -39,11 +72,17 @@ function PostPage() {
             const res = await fetch(`/posts/${slug}.md`)
             const raw = await res.text()
             const { attributes, body } = fm(raw) as { attributes: any; body: string }
-            setPostTitle(attributes.title || slug)
+            const title = attributes.title || slug.replace(/-/g, ' ')
+            setPostTitle(title)
             setPostHtml(md.render(body))
+
+            document.title = `${title} - Abi Kakolla`
+            setMeta('description', getDescription(body))
+            setCanonical(`https://kakolla.com/${slug}`)
         }
 
         load()
+        return () => { document.title = 'Abi Kakolla' }
     }, [slug])
 
     return (
