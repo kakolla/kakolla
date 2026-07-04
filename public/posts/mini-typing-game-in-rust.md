@@ -2,6 +2,8 @@
 
 6/27/2026
 
+[[repo link]](https://github.com/kakolla/typing-sim/)
+
 
 I've recently started the goal of picking up rust, so I wanted to solidify it by doing a super easy project.
 
