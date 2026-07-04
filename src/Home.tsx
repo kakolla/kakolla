@@ -14,14 +14,14 @@ function Home({ pageState }: Props) {
                 machine learning, neuroscience, and distributed systems.
             </h1>
             <h1 className="pt-4 max-w-xl">
-                I'm currently working on ML infrastructure and FinOps-focused data engineering systems at 
-                <p className="inline text-sky-600"> 
-                <a href="https://stitcher.ai/" target="_blank"> StitcherAI</a></p>, and 
-                researching graph-based LLM reasoning at the <p className="inline text-sky-600">
-                <a href="https://itemsusc.org/" target="_blank">
-                Center for Neural 
-                Engineering @ USC
-                </a></p>
+                I'm currently working on Distributed systems at
+                <p className="inline text-sky-400">
+                    <a href="https://engineering.fb.com/category/core-infra/" target="_blank"> Meta</a></p>, and
+                researching graph-based LLM reasoning at the <p className="inline text-sky-400">
+                    <a href="https://itemsusc.org/" target="_blank">
+                        Center for Neural
+                        Engineering @ USC
+                    </a></p>
             </h1>
 
 
