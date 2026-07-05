@@ -65,6 +65,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
     // refs for decal
     const decalPlaneRef = useRef<THREE.Mesh>();
+    const billboardCubeRef = useRef<THREE.Mesh>();
     const texturesListRef = useRef<THREE.Texture[]>([]);
 
     // ref for snow system
@@ -238,6 +239,7 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                     cube.position.set(-37, 6, 18.5);
                     cube.rotation.y += 0.3;
                     sceneRef.current!.add(cube);
+                    billboardCubeRef.current = cube;
 
                     // const decalTexture = new THREE.TextureLoader().load(decalPath);
                     const decalTexture = texturesListRef.current[projCount];
@@ -248,20 +250,34 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                         transparent: true,
                     });
 
+                    // scanline tv effect on the billboard
+                    decalMaterial.onBeforeCompile = (shader) => {
+                        shader.vertexShader = 'varying vec2 vCrtUv;\n' + shader.vertexShader.replace(
+                            '#include <uv_vertex>', '#include <uv_vertex>\n vCrtUv = uv;');
+                        shader.fragmentShader = 'varying vec2 vCrtUv;\n' + shader.fragmentShader.replace(
+                            '#include <dithering_fragment>',
+                            `#include <dithering_fragment>
+                            gl_FragColor.rgb -= sin(vCrtUv.y * 1000.0) * 0.03;
+                            gl_FragColor.rgb *= 0.9 + 0.1 * smoothstep(0.9, 0.25, distance(vCrtUv, vec2(0.5)));`);
+                    };
+
                     // define the plane size 
                     const planeGeometry = new THREE.PlaneGeometry(1.778, 1);  // Adjust size as needed
 
                     // define plane ref
                     decalPlaneRef.current = new THREE.Mesh(planeGeometry, decalMaterial);
 
-                    // set position
-                    decalPlaneRef.current.position.set(cube.position.x - 0.03, cube.position.y, cube.position.z + 0.02);
+                    // sit the screen on cube face
+                    decalPlaneRef.current.position.set(-0.026, 0, 0); // just outside the 0.05-thick cube's -x face
+                    decalPlaneRef.current.rotation.set(0, -Math.PI / 2, 0);
 
-                    // rptate plane
-                    decalPlaneRef.current.rotation.set(0, 0.3 + 3 * (Math.PI) / 2, 0); // Adjust rotation as needed
+                    // warm street-lamp glow around the billboard
+                    const warmLight = new THREE.PointLight(0xff9a4d, 5, 2, 2);
+                    warmLight.position.set(0, 0.5, 1); // local offset, just in front of the screen
+                    decalPlaneRef.current.add(warmLight);
 
-                    // add to scene
-                    sceneRef.current!.add(decalPlaneRef.current);
+                    // parent to the cube so screen + glow follow it
+                    cube.add(decalPlaneRef.current);
 
 
 
@@ -280,18 +296,17 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
                 sceneRef.current?.remove(projModelRef.current);
             }
 
-            // dispose decal plane properly
-            if (decalPlaneRef.current) {
-                if (decalPlaneRef.current.geometry) {
-                    decalPlaneRef.current.geometry.dispose();
-                }
-                if (decalPlaneRef.current.material instanceof THREE.MeshStandardMaterial) {
-                    if (decalPlaneRef.current.material.map) {
-                        decalPlaneRef.current.material.map.dispose();
+            // remove  the whole billboard (cube + screen + glow).
+            // NOTE: don't dispose material.map — textures are shared/reused across projects.
+            if (billboardCubeRef.current) {
+                billboardCubeRef.current.traverse((obj) => {
+                    if (obj instanceof THREE.Mesh) {
+                        obj.geometry?.dispose();
+                        (obj.material as THREE.Material)?.dispose();
                     }
-                    decalPlaneRef.current.material.dispose();
-                }
-                sceneRef.current?.remove(decalPlaneRef.current);
+                });
+                sceneRef.current?.remove(billboardCubeRef.current);
+                billboardCubeRef.current = undefined;
             }
         }
 
@@ -670,6 +685,33 @@ function ThreeScene({ pageState, setEndLoadingScreen }: Props) {
 
     }, []);
 
+
+    // wheel over the billboard scrolls the posts
+    useEffect(() => {
+        const canvas = rendererRef.current?.domElement;
+        if (!canvas) return;
+        const raycaster = new THREE.Raycaster();
+        const ndc = new THREE.Vector2();
+
+        const onWheel = (e: WheelEvent) => {
+            const posts = document.getElementById("projects-scroll"); // only exists on the projects page
+            if (!posts || !decalPlaneRef.current || !cameraRef.current) return;
+
+            const rect = canvas.getBoundingClientRect();
+            ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(ndc, cameraRef.current);
+
+            if (raycaster.intersectObject(decalPlaneRef.current).length > 0) {
+                e.preventDefault();
+                e.stopImmediatePropagation(); // ignore OrbitControls zoom listener
+                posts.scrollBy({ top: e.deltaY });
+            }
+        };
+
+        canvas.addEventListener("wheel", onWheel, { capture: true, passive: false });
+        return () => canvas.removeEventListener("wheel", onWheel, { capture: true });
+    }, []);
 
     // react to pageState changes
     useEffect(() => {

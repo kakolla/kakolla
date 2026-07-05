@@ -92,6 +92,7 @@ function Projects({ projCount, setProjCountFunction }: Props) {
     return (
         <div
             ref={containerRef}
+            id="projects-scroll"
             className="highlighted-text w-1/3 animate-fade absolute
             h-[35vh] left-20 text-white overflow-y-scroll no-scrollbar bottom-10
             max-md:w-3/4 max-md:h-48
