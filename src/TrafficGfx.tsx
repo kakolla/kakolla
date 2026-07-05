@@ -56,6 +56,8 @@ export async function loadTrafficLane(
             }
             instancedMesh.instanceMatrix.needsUpdate = true;
 
+            instancedMesh.frustumCulled = false;
+
             laneRefs.instancedMesh.current = instancedMesh;
             sceneRef.current.add(instancedMesh);
         }
