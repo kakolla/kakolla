@@ -38,6 +38,7 @@ function Notes({ pageState }: Props) {
 
     // Posts list 
     const postsList = [
+        "linux-performance-analysis.md",
         "mini-typing-game-in-rust.md",
         "lexer.md",
         "building-a-compiler.md",
