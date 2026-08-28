@@ -38,6 +38,7 @@ function Notes({ pageState }: Props) {
 
     // Posts list 
     const postsList = [
+        "tail-latency-optimizations.md",
         "when-a-microsecond-is-an-eternity-notes.md",
         "linux-performance-analysis.md",
         "mini-typing-game-in-rust.md",
