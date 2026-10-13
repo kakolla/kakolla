@@ -1,5 +1,3 @@
-
-
 6/27/2026
 
 [[repo link]](https://github.com/kakolla/typing-sim/)
